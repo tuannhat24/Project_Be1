@@ -15,6 +15,14 @@ $theaterModel = new TheaterModel();
 $scheduleModel = new Schedule();
 $bookingModel = new Booking();
 ?>
+
+<?php
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $user_details = $userModel->getUserById($user_id);
+    $user = $user_details[0];
+} ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -55,8 +63,17 @@ $bookingModel = new Booking();
                             </li>
                             }
                         <?php endif; ?>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="/Project_Be1/Booking-movies/user/profile.php">Tài Khoản</a>
+                            <a class="nav-link" href="/Project_Be1/Booking-movies/user/profile.php">
+                                <?php
+                                if ($user) {
+                                    echo 'Hello, ' . $user['username'];
+                                } else {
+                                    echo 'Tài khoản';
+                                }
+                                ?>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/Project_Be1/Booking-movies/user/logout.php">Đăng Xuất</a>
