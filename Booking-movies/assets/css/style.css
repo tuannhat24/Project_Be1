@@ -1,253 +1,257 @@
 /* Reset và style chung */
 :root {
-  --primary-color: #032055;
-  --secondary-color: #ff2c1f;
-  --text-color: #333;
-  --light-bg: #f8f9fa;
-  --dark-bg: #1a1a1a;
+    --primary-color: #032055;
+    --secondary-color: #ff2c1f;
+    --text-color: #333;
+    --light-bg: #f8f9fa;
+    --dark-bg: #1a1a1a;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  color: var(--text-color);
-  background-color: #f4f7fc;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+    background-color: #f4f7fc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.col {
+    padding-right: 0 !important;
 }
 
 /* Navbar styles */
 .navbar {
-  background: var(--primary-color) !important;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--primary-color) !important;
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff !important;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  color: rgba(255,255,255,0.9) !important;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
-  color: var(--secondary-color) !important;
+    color: var(--secondary-color) !important;
 }
 
 /* Card styles */
 .card {
-  border: none;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  transition: transform 0.3s ease;
-  overflow: hidden;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    overflow: hidden;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-5px);
 }
 
 .card-img-top {
-  height: 400px;
-  object-fit: cover;
-  border-radius: 15px 15px 0 0;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
 }
 
 .card-body {
-  padding: 1.5rem;
+    padding: 1.5rem;
 }
 
 .card-title {
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
 }
 
 /* Button styles */
 .btn {
-  padding: 0.6rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .btn-primary {
-  background: var(--primary-color);
-  border: none;
+    background: var(--primary-color);
+    border: none;
 }
 
 .btn-primary:hover {
-  background: #043277;
-  transform: translateY(-2px);
+    background: #043277;
+    transform: translateY(-2px);
 }
 
 .btn-outline-primary {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .btn-outline-primary:hover {
-  background: var(--primary-color);
-  color: #fff;
+    background: var(--primary-color);
+    color: #fff;
 }
 
 /* Movie schedule styles */
 .date-nav .btn {
-  border-radius: 50px;
-  margin: 0 5px;
-  min-width: 120px;
+    border-radius: 50px;
+    margin: 0 5px;
+    min-width: 120px;
 }
 
 .theater-nav .btn-group .btn {
-  border-radius: 50px;
-  margin: 0 5px;
+    border-radius: 50px;
+    margin: 0 5px;
 }
 
 /* Seat selection styles */
 .screen {
-  background: linear-gradient(45deg, #032055, #043277);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: linear-gradient(45deg, #032055, #043277);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .seats-container {
-  gap: 15px;
-  padding: 20px;
+    gap: 15px;
+    padding: 20px;
 }
 
 .seat {
-  border-radius: 10px;
-  padding: 15px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .seat.available {
-  background: #fff;
-  border: 2px solid #e3e3e3;
+    background: #fff;
+    border: 2px solid #e3e3e3;
 }
 
 .seat.available:hover {
-  background: #f8f9fa;
-  border-color: var(--primary-color);
+    background: #f8f9fa;
+    border-color: var(--primary-color);
 }
 
 .seat.selected {
-  background: var(--primary-color);
-  color: white;
-  border: 2px solid var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+    border: 2px solid var(--primary-color);
 }
 
 .seat.booked {
-  background: #ffebee;
-  border: 2px solid #ffcdd2;
+    background: #ffebee;
+    border: 2px solid #ffcdd2;
 }
 
 /* Footer styles */
 footer {
-  background: var(--primary-color);
-  color: #fff;
-  margin-top: auto;
+    background: var(--primary-color);
+    color: #fff;
+    margin-top: auto;
 }
 
 footer h5 {
-  color: var(--secondary-color);
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
 }
 
 footer a {
-  color: rgba(255,255,255,0.8);
-  text-decoration: none;
-  transition: color 0.3s ease;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 
 footer a:hover {
-  color: var(--secondary-color);
+    color: var(--secondary-color);
 }
 
 /* Responsive styles */
 @media (max-width: 768px) {
-  .card-img-top {
-    height: 300px;
-  }
-  
-  .seats-container {
-    grid-template-columns: repeat(8, 1fr);
-  }
+    .card-img-top {
+        height: 300px;
+    }
+
+    .seats-container {
+        grid-template-columns: repeat(8, 1fr);
+    }
 }
 
 @media (max-width: 576px) {
-  .card-img-top {
-    height: 250px;
-  }
-  
-  .seats-container {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  
-  .btn {
-    padding: 0.5rem 1rem;
-  }
+    .card-img-top {
+        height: 250px;
+    }
+
+    .seats-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+    }
 }
 
 /* Form styles */
 .form-control {
-  border-radius: 50px;
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #e3e3e3;
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e3e3e3;
 }
 
 .form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: none;
+    border-color: var(--primary-color);
+    box-shadow: none;
 }
 
 /* Table styles */
 .table {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .table thead th {
-  background: var(--primary-color);
-  color: white;
-  font-weight: 500;
-  border: none;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    border: none;
 }
 
 .table td {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
 /* Alert styles */
 .alert {
-  border-radius: 10px;
-  border: none;
+    border-radius: 10px;
+    border: none;
 }
 
 /* Modal styles */
 .modal-content {
-  border-radius: 15px;
+    border-radius: 15px;
 }
 
 .modal-header {
-  background: var(--primary-color);
-  color: white;
-  border-radius: 15px 15px 0 0;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 15px 15px 0 0;
 }
 
 .modal-header .btn-close {
-  color: white;
+    color: white;
 }
