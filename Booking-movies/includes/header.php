@@ -41,6 +41,20 @@ $bookingModel = new Booking();
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isset($_SESSION['user_id'])): ?>
+                        <?php if ($_SESSION['role'] == 'admin'): ?>
+                            <li class="nav-item">
+                                <?php $current_page = $_SERVER['REQUEST_URI']; ?>
+                                <select class="form-select" onchange="window.location.href=this.value">
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_movies.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_movies.php') echo 'selected'; ?>>Manage Movies</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_schedules.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_schedules.php') echo 'selected'; ?>>Manage Schedules</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_tickets.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_tickets.php') echo 'selected'; ?>>Manage Tickets</option>
+                                </select>
+                            </li>
+                            }
+                        <?php endif; ?>
                         <li class="nav-item">
                             <a class="nav-link" href="/Project_Be1/Booking-movies/user/profile.php">Tài Khoản</a>
                         </li>
