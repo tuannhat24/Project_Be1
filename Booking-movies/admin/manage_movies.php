@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $duration = $_POST['duration'];
     $release_date = $_POST['release_date'];
     $status = $_POST['status'];
-    
+
     // Xử lý upload poster nếu có
     $poster = null;
     if (isset($_FILES['poster']) && $_FILES['poster']['error'] == 0) {
@@ -22,12 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $file_extension = pathinfo($_FILES["poster"]["name"], PATHINFO_EXTENSION);
         $file_name = uniqid() . "." . $file_extension;
         $target_file = $target_dir . $file_name;
-        
+
         if (move_uploaded_file($_FILES["poster"]["tmp_name"], $target_file)) {
             $poster = "/Project_Be1/Booking-movies/assets/images/movies/" . $file_name;
         }
     }
-    
+
     if (isset($_POST['id'])) {
         // Cập nhật phim
         if ($movieModel->updateMovie($_POST['id'], $title, $description, $duration, $release_date, $status, $poster)) {
@@ -60,12 +60,12 @@ $movies = $movieModel->getAllMovies();
 
 <div class="container mt-4">
     <h2>Quản lý phim</h2>
-    
-    <?php if(isset($success)): ?>
+
+    <?php if (isset($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
-    
-    <?php if(isset($error)): ?>
+
+    <?php if (isset($error)): ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php endif; ?>
 
@@ -87,39 +87,39 @@ $movies = $movieModel->getAllMovies();
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($movies as $movie): ?>
-                <tr>
-                    <td><?php echo $movie['id']; ?></td>
-                    <td>
-                        <?php if($movie['poster']): ?>
-                            <img src="<?php echo $movie['poster']; ?>" height="50">
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo $movie['title']; ?></td>
-                    <td><?php echo $movie['duration']; ?> phút</td>
-                    <td><?php echo date('d/m/Y', strtotime($movie['release_date'])); ?></td>
-                    <td>
-                        <?php
-                        $status_text = [
-                            'showing' => 'Đang chiếu',
-                            'coming_soon' => 'Sắp chiếu',
-                            'ended' => 'Đã kết thúc'
-                        ];
-                        echo $status_text[$movie['status']];
-                        ?>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-info edit-movie" 
+                <?php foreach ($movies as $movie): ?>
+                    <tr>
+                        <td><?php echo $movie['id']; ?></td>
+                        <td>
+                            <?php if ($movie['poster']): ?>
+                                <img src="<?php echo $movie['poster']; ?>" height="50">
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo $movie['title']; ?></td>
+                        <td><?php echo $movie['duration']; ?> phút</td>
+                        <td><?php echo date('d/m/Y', strtotime($movie['release_date'])); ?></td>
+                        <td>
+                            <?php
+                            $status_text = [
+                                'now_showing' => 'Đang chiếu',
+                                'coming_soon' => 'Sắp chiếu',
+                                'ended' => 'Đã kết thúc'
+                            ];
+                            echo $status_text[$movie['status']];
+                            ?>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info edit-movie"
                                 data-movie='<?php echo json_encode($movie); ?>'>
-                            Sửa
-                        </button>
-                        <a href="?delete=<?php echo $movie['id']; ?>" 
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Bạn có chắc muốn xóa phim này?')">
-                            Xóa
-                        </a>
-                    </td>
-                </tr>
+                                Sửa
+                            </button>
+                            <a href="?delete=<?php echo $movie['id']; ?>"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Bạn có chắc muốn xóa phim này?')">
+                                Xóa
+                            </a>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -173,31 +173,31 @@ $movies = $movieModel->getAllMovies();
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const editButtons = document.querySelectorAll('.edit-movie');
-    const movieModal = new bootstrap.Modal(document.getElementById('movieModal'));
-    const movieForm = document.getElementById('movieForm');
-    
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const movie = JSON.parse(this.dataset.movie);
-            
-            movieForm.id.value = movie.id;
-            movieForm.title.value = movie.title;
-            movieForm.description.value = movie.description;
-            movieForm.duration.value = movie.duration;
-            movieForm.release_date.value = movie.release_date.split(' ')[0];
-            movieForm.status.value = movie.status;
-            
-            movieModal.show();
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.edit-movie');
+        const movieModal = new bootstrap.Modal(document.getElementById('movieModal'));
+        const movieForm = document.getElementById('movieForm');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const movie = JSON.parse(this.dataset.movie);
+
+                movieForm.id.value = movie.id;
+                movieForm.title.value = movie.title;
+                movieForm.description.value = movie.description;
+                movieForm.duration.value = movie.duration;
+                movieForm.release_date.value = movie.release_date.split(' ')[0];
+                movieForm.status.value = movie.status;
+
+                movieModal.show();
+            });
+        });
+
+        document.querySelector('[data-bs-target="#movieModal"]').addEventListener('click', function() {
+            movieForm.reset();
+            movieForm.id.value = '';
         });
     });
-    
-    document.querySelector('[data-bs-target="#movieModal"]').addEventListener('click', function() {
-        movieForm.reset();
-        movieForm.id.value = '';
-    });
-});
 </script>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>

@@ -6,15 +6,18 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Movie.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Booking.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/TheaterModel.php';
 
 // Khởi tạo các đối tượng model
 $userModel = new User();
 $movieModel = new Movie();
+$theaterModel = new TheaterModel();
 $scheduleModel = new Schedule();
 $bookingModel = new Booking();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +25,7 @@ $bookingModel = new Booking();
     <link rel="stylesheet" href="/Project_Be1/Booking-movies/assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -36,7 +40,7 @@ $bookingModel = new Booking();
                     </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <?php if(isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="/Project_Be1/Booking-movies/user/profile.php">Tài Khoản</a>
                         </li>
@@ -56,4 +60,5 @@ $bookingModel = new Booking();
         </div>
     </nav>
 </body>
+
 </html>
