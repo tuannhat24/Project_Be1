@@ -74,8 +74,8 @@ for ($i = 0; $i < 7; $i++) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
-                                <img src="<?php echo $schedule['poster']; ?>" class="img-fluid rounded"
-                                    alt="<?php echo $schedule['title']; ?>">
+                                <img src="./assets/img/<?php echo $schedule['poster']; ?>" class="img-fluid rounded"
+                                    alt="<?php echo $schedule['title']; ?>" style="height: 200px;">
                             </div>
                             <div class="col-md-9">
                                 <h4><?php echo $schedule['title']; ?></h4>

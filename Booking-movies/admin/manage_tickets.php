@@ -126,11 +126,12 @@ $tickets = $bookingModel->getAllBookings();
             button.addEventListener('click', function() {
                 const ticket = JSON.parse(this.dataset.ticket);
                 const details = document.getElementById('ticket-details');
+                const phone = ticket.phone ? ticket.phone : 'Chưa có';
 
                 details.innerHTML = `
                 <p><strong>Mã vé:</strong> #${ticket.id}</p>
                 <p><strong>Người đặt:</strong> ${ticket.fullname}</p>
-                <p><strong>Số điện thoại:</strong> ${ticket.phone}</p>
+                <p><strong>Số điện thoại:</strong> ${phone}</p>
                 <p><strong>Email:</strong> ${ticket.email}</p>
                 <p><strong>Phim:</strong> ${ticket.title}</p>
                 <p><strong>Rạp:</strong> ${ticket.theater_name}</p>

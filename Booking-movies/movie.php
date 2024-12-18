@@ -21,7 +21,7 @@ $schedules = $scheduleModel->getSchedulesByMovie($movie_id);
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-4">
-            <img src="<?php echo $movie['poster']; ?>" class="img-fluid rounded"
+            <img src="./assets/img/<?php echo $movie['poster']; ?>" class="img-fluid rounded"
                 alt="<?php echo $movie['title']; ?>">
         </div>
         <div class="col-md-8">

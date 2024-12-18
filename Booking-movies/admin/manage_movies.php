@@ -15,38 +15,50 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 
 // Xử lý thêm/sửa phim
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id = $_POST['id'] ?? null;
     $title = $_POST['title'];
     $description = $_POST['description'];
     $duration = $_POST['duration'];
     $release_date = $_POST['release_date'];
     $status = $_POST['status'];
 
-    // Xử lý upload poster nếu có
     $poster = null;
-    if (isset($_FILES['poster']) && $_FILES['poster']['error'] == 0) {
-        $target_dir = "../assets/images/movies/";
-        $file_extension = pathinfo($_FILES["poster"]["name"], PATHINFO_EXTENSION);
-        $file_name = uniqid() . "." . $file_extension;
-        $target_file = $target_dir . $file_name;
+    if (is_uploaded_file($_FILES['poster']['tmp_name'])) {
+        $poster = hash('sha256', time() . rand()) . '.' . pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION);
+        $path = '../assets/img/' . $poster;
 
-        if (move_uploaded_file($_FILES["poster"]["tmp_name"], $target_file)) {
-            $poster = "/Project_Be1/Booking-movies/assets/images/movies/" . $file_name;
+        if (!move_uploaded_file($_FILES['poster']['tmp_name'], $path)) {
+            $error = "Không thể tải tệp hình ảnh lên.";
+            return;
         }
+    } else if ($id) {
+        $movie = $movieModel->getMovieById($id);
     }
 
-    if (isset($_POST['id'])) {
-        // Cập nhật phim
-        if ($movieModel->updateMovie($_POST['id'], $title, $description, $duration, $release_date, $status, $poster)) {
+
+    if ($id) {
+        // Xử lý CẬP NHẬT phim
+        $updateResult = $movieModel->updateMovie($id, $title, $description, $duration, $release_date, $status, $poster);
+
+        if ($updateResult) {
             $success = "Cập nhật phim thành công!";
         } else {
             $error = "Có lỗi xảy ra khi cập nhật phim!";
         }
     } else {
-        // Thêm phim mới
-        if ($movieModel->addMovie($title, $description, $duration, $release_date, $status, $poster)) {
-            $success = "Thêm phim mới thành công!";
+        // Xử lý THÊM phim mới
+        if (!$poster) {
+            $error = "Vui lòng tải lên poster phim!";
         } else {
-            $error = "Có lỗi xảy ra khi thêm phim!";
+            $addResult = $movieModel->addMovie($title, $description, $duration, $release_date, $status, $poster);
+
+            if ($addResult) {
+                $_SESSION['notification'] = "Thêm phim thành công!";
+                header("Location: http://localhost/Project_Be1/Booking-movies/admin/manage_movies.php");
+                exit();
+            } else {
+                $error = "Có lỗi xảy ra khi thêm phim!";
+            }
         }
     }
 }
@@ -98,7 +110,7 @@ $movies = $movieModel->getAllMovies();
                         <td><?php echo $movie['id']; ?></td>
                         <td>
                             <?php if ($movie['poster']): ?>
-                                <img src="<?php echo $movie['poster']; ?>" height="50">
+                                <img src="../assets/img/<?php echo $movie['poster']; ?>" height="50">
                             <?php endif; ?>
                         </td>
                         <td><?php echo $movie['title']; ?></td>
@@ -161,12 +173,15 @@ $movies = $movieModel->getAllMovies();
                     </div>
                     <div class="mb-3">
                         <label>Poster</label>
+                        <div class="mb-2">
+                            <img id="poster-preview" src="#" alt="Poster Preview" style="max-height: 150px;">
+                        </div>
                         <input type="file" name="poster" class="form-control" accept="image/*">
                     </div>
                     <div class="mb-3">
                         <label>Trạng thái</label>
                         <select name="status" class="form-control">
-                            <option value="showing">Đang chiếu</option>
+                            <option value="now_showing">Đang chiếu</option>
                             <option value="coming_soon">Sắp chiếu</option>
                             <option value="ended">Đã kết thúc</option>
                         </select>
@@ -195,6 +210,16 @@ $movies = $movieModel->getAllMovies();
                 movieForm.release_date.value = movie.release_date.split(' ')[0];
                 movieForm.status.value = movie.status;
 
+                // Hiển thị hình ảnh poster, nếu có
+                const posterPreview = document.getElementById('poster-preview');
+                if (movie.poster) {
+                    posterPreview.src = '../assets/img/' + movie.poster;
+                    posterPreview.style.display = 'block';
+                } else {
+                    posterPreview.src = '#';
+                    posterPreview.style.display = 'none';
+                }
+
                 movieModal.show();
             });
         });
@@ -202,6 +227,9 @@ $movies = $movieModel->getAllMovies();
         document.querySelector('[data-bs-target="#movieModal"]').addEventListener('click', function() {
             movieForm.reset();
             movieForm.id.value = '';
+            const posterPreview = document.getElementById('poster-preview');
+            posterPreview.src = '#';
+            posterPreview.style.display = 'none';
         });
     });
 </script>

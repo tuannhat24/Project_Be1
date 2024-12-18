@@ -20,19 +20,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $show_time = $_POST['show_time'];
     $price = $_POST['price'];
 
-    if (isset($_POST['id'])) {
+    if ($_POST['id']) {
         // Cập nhật lịch chiếu
-        if ($scheduleModel->updateSchedule($_POST['id'], $movie_id, $theater_id, $show_time, $price)) {
+        $existingSchedule = $scheduleModel->getScheduleByMovieTheaterTime($movie_id, $theater_id, $show_time, $price);
+        if ($existingSchedule) {
+            $error = "Lịch chiếu này đã tồn tại, không thể sửa!";
+        } else if ($scheduleModel->updateSchedule($_POST['id'], $movie_id, $theater_id, $show_time, $price)) {
             $success = "Cập nhật lịch chiếu thành công!";
         } else {
             $error = "Có lỗi xảy ra khi cập nhật lịch chiếu!";
         }
     } else {
-        // Thêm lịch chiếu mới
-        if ($scheduleModel->addSchedule($movie_id, $theater_id, $show_time, $price)) {
-            $success = "Thêm lịch chiếu mới thành công!";
+        // Kiểm tra lịch chiếu đã tồn tại chưa
+        $existingSchedule = $scheduleModel->getScheduleByMovieTheaterTime($movie_id, $theater_id, $show_time, $price);
+        if ($existingSchedule) {
+            $error = "Lịch chiếu này đã tồn tại!";
         } else {
-            $error = "Có lỗi xảy ra khi thêm lịch chiếu!";
+            // Thêm lịch chiếu mới
+            if ($scheduleModel->addSchedule($movie_id, $theater_id, $show_time, $price)) {
+                $success = "Thêm lịch chiếu mới thành công!";
+            } else {
+                $error = "Có lỗi xảy ra khi thêm lịch chiếu!";
+            }
         }
     }
 }

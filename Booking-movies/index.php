@@ -15,7 +15,7 @@ $coming_movies = $movieModel->getAllMovies('coming_soon');
         <?php foreach ($showing_movies as $movie): ?>
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <img src="<?php echo $movie['poster']; ?>" class="card-img-top"
+                    <img src="./assets/img/<?php echo $movie['poster']; ?>" class="card-img-top"
                         alt="<?php echo $movie['title']; ?>">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo $movie['title']; ?></h5>
@@ -36,7 +36,7 @@ $coming_movies = $movieModel->getAllMovies('coming_soon');
         <?php foreach ($coming_movies as $movie): ?>
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <img src="<?php echo $movie['poster']; ?>" class="card-img-top"
+                    <img src="./assets/img/<?php echo $movie['poster']; ?>" class="card-img-top"
                         alt="<?php echo $movie['title']; ?>">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo $movie['title']; ?></h5>
