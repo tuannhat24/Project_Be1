@@ -1,5 +1,4 @@
 <?php
-session_start();
 include '../includes/header.php';
 
 // Nếu đã đăng nhập thì chuyển về trang chủ
