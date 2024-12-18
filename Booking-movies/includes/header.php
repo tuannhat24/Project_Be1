@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/db.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/User.php';

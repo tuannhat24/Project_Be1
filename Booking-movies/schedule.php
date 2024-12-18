@@ -98,25 +98,4 @@ for ($i = 0; $i < 7; $i++) {
             <?php endif; ?>
 </div>
 
-<style>
-    .date-nav .btn {
-        padding: 10px 8px;
-        margin-bottom: 5px;
-    }
-
-    .theater-nav {
-        overflow-x: auto;
-        white-space: nowrap;
-        padding-bottom: 5px;
-    }
-
-    .theater-nav .btn-group {
-        display: inline-flex;
-    }
-
-    .showtimes {
-        margin-top: 15px;
-    }
-</style>
-
 <?php include 'includes/footer.php'; ?>

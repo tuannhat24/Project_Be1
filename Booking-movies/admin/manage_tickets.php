@@ -1,6 +1,13 @@
 <?php
+session_start();
 include '../includes/header.php';
 
+// Kiểm tra đã login hay chưa
+if (!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] === false) {
+    header("Location: /Project_Be1/Booking-movies/");
+}
+
+// Kiểm tra quyền admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     header("Location: /Project_Be1/Booking-movies/");
     exit();
@@ -10,7 +17,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 if (isset($_POST['update_status'])) {
     $booking_id = $_POST['booking_id'];
     $status = $_POST['status'];
-    
+
     if ($bookingModel->updateBookingStatus($booking_id, $status)) {
         $success = "Cập nhật trạng thái vé thành công!";
     } else {
@@ -24,12 +31,12 @@ $tickets = $bookingModel->getAllBookings();
 
 <div class="container mt-4">
     <h2>Quản lý vé</h2>
-    
-    <?php if(isset($success)): ?>
+
+    <?php if (isset($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
-    
-    <?php if(isset($error)): ?>
+
+    <?php if (isset($error)): ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php endif; ?>
 
@@ -49,46 +56,46 @@ $tickets = $bookingModel->getAllBookings();
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($tickets as $ticket): ?>
-                <tr>
-                    <td>#<?php echo $ticket['id']; ?></td>
-                    <td>
-                        <?php echo $ticket['fullname']; ?><br>
-                        <small><?php echo $ticket['phone']; ?></small>
-                    </td>
-                    <td><?php echo $ticket['title']; ?></td>
-                    <td><?php echo $ticket['theater_name']; ?></td>
-                    <td><?php echo date('d/m/Y H:i', strtotime($ticket['show_time'])); ?></td>
-                    <td><?php echo $ticket['seat_number']; ?></td>
-                    <td><?php echo date('d/m/Y H:i', strtotime($ticket['booking_date'])); ?></td>
-                    <td>
-                        <form method="POST" class="status-form">
-                            <input type="hidden" name="update_status">
-                            <input type="hidden" name="booking_id" value="<?php echo $ticket['id']; ?>">
-                            <select name="status" class="form-select form-select-sm" 
+                <?php foreach ($tickets as $ticket): ?>
+                    <tr>
+                        <td>#<?php echo $ticket['id']; ?></td>
+                        <td>
+                            <?php echo $ticket['fullname']; ?><br>
+                            <small><?php echo $ticket['phone']; ?></small>
+                        </td>
+                        <td><?php echo $ticket['title']; ?></td>
+                        <td><?php echo $ticket['theater_name']; ?></td>
+                        <td><?php echo date('d/m/Y H:i', strtotime($ticket['show_time'])); ?></td>
+                        <td><?php echo $ticket['seat_number']; ?></td>
+                        <td><?php echo date('d/m/Y H:i', strtotime($ticket['booking_date'])); ?></td>
+                        <td>
+                            <form method="POST" class="status-form">
+                                <input type="hidden" name="update_status">
+                                <input type="hidden" name="booking_id" value="<?php echo $ticket['id']; ?>">
+                                <select name="status" class="form-select form-select-sm"
                                     onchange="this.form.submit()">
-                                <option value="pending" 
-                                    <?php echo $ticket['status'] == 'pending' ? 'selected' : ''; ?>>
-                                    Đang chờ
-                                </option>
-                                <option value="confirmed" 
-                                    <?php echo $ticket['status'] == 'confirmed' ? 'selected' : ''; ?>>
-                                    Đã xác nhận
-                                </option>
-                                <option value="cancelled" 
-                                    <?php echo $ticket['status'] == 'cancelled' ? 'selected' : ''; ?>>
-                                    Đã hủy
-                                </option>
-                            </select>
-                        </form>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-info view-ticket" 
+                                    <option value="pending"
+                                        <?php echo $ticket['status'] == 'pending' ? 'selected' : ''; ?>>
+                                        Đang chờ
+                                    </option>
+                                    <option value="confirmed"
+                                        <?php echo $ticket['status'] == 'confirmed' ? 'selected' : ''; ?>>
+                                        Đã xác nhận
+                                    </option>
+                                    <option value="cancelled"
+                                        <?php echo $ticket['status'] == 'cancelled' ? 'selected' : ''; ?>>
+                                        Đã hủy
+                                    </option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info view-ticket"
                                 data-ticket='<?php echo json_encode($ticket); ?>'>
-                            Chi tiết
-                        </button>
-                    </td>
-                </tr>
+                                Chi tiết
+                            </button>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -111,16 +118,16 @@ $tickets = $bookingModel->getAllBookings();
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const viewButtons = document.querySelectorAll('.view-ticket');
-    const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
-    
-    viewButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const ticket = JSON.parse(this.dataset.ticket);
-            const details = document.getElementById('ticket-details');
-            
-            details.innerHTML = `
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewButtons = document.querySelectorAll('.view-ticket');
+        const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const ticket = JSON.parse(this.dataset.ticket);
+                const details = document.getElementById('ticket-details');
+
+                details.innerHTML = `
                 <p><strong>Mã vé:</strong> #${ticket.id}</p>
                 <p><strong>Người đặt:</strong> ${ticket.fullname}</p>
                 <p><strong>Số điện thoại:</strong> ${ticket.phone}</p>
@@ -135,11 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     ticket.status === 'confirmed' ? 'Đã xác nhận' : 'Đã hủy'
                 }</p>
             `;
-            
-            ticketModal.show();
+
+                ticketModal.show();
+            });
         });
     });
-});
 </script>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>

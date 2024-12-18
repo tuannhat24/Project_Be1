@@ -52,19 +52,4 @@ $coming_movies = $movieModel->getAllMovies('coming_soon');
     </div>
 </div>
 
-<style>
-    .card-img-top {
-        height: 400px;
-        object-fit: cover;
-    }
-
-    .card-title {
-        height: 48px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-</style>
-
 <?php include 'includes/footer.php'; ?>

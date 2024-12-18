@@ -1,5 +1,11 @@
 <?php
+session_start();
 include '../includes/header.php';
+
+// Kiểm tra đã login hay chưa
+if (!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] === false) {
+    header("Location: /Project_Be1/Booking-movies/");
+}
 
 // Kiểm tra quyền admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {

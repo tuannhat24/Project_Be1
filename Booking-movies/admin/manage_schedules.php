@@ -1,6 +1,13 @@
 <?php
+session_start();
 include '../includes/header.php';
 
+// Kiểm tra đã login hay chưa
+if (!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] === false) {
+    header("Location: /Project_Be1/Booking-movies/");
+}
+
+// Kiểm tra quyền admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     header("Location: /Project_Be1/Booking-movies/");
     exit();
@@ -12,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $theater_id = $_POST['theater_id'];
     $show_time = $_POST['show_time'];
     $price = $_POST['price'];
-    
+
     if (isset($_POST['id'])) {
         // Cập nhật lịch chiếu
         if ($scheduleModel->updateSchedule($_POST['id'], $movie_id, $theater_id, $show_time, $price)) {
@@ -49,12 +56,12 @@ $schedules = $scheduleModel->getAllSchedules();
 
 <div class="container mt-4">
     <h2>Quản lý lịch chiếu</h2>
-    
-    <?php if(isset($success)): ?>
+
+    <?php if (isset($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
-    
-    <?php if(isset($error)): ?>
+
+    <?php if (isset($error)): ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php endif; ?>
 
@@ -75,25 +82,25 @@ $schedules = $scheduleModel->getAllSchedules();
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($schedules as $schedule): ?>
-                <tr>
-                    <td><?php echo $schedule['id']; ?></td>
-                    <td><?php echo $schedule['movie_title']; ?></td>
-                    <td><?php echo $schedule['theater_name']; ?></td>
-                    <td><?php echo date('d/m/Y H:i', strtotime($schedule['show_time'])); ?></td>
-                    <td><?php echo number_format($schedule['price']); ?>đ</td>
-                    <td>
-                        <button class="btn btn-sm btn-info edit-schedule" 
+                <?php foreach ($schedules as $schedule): ?>
+                    <tr>
+                        <td><?php echo $schedule['id']; ?></td>
+                        <td><?php echo $schedule['movie_title']; ?></td>
+                        <td><?php echo $schedule['theater_name']; ?></td>
+                        <td><?php echo date('d/m/Y H:i', strtotime($schedule['show_time'])); ?></td>
+                        <td><?php echo number_format($schedule['price']); ?>đ</td>
+                        <td>
+                            <button class="btn btn-sm btn-info edit-schedule"
                                 data-schedule='<?php echo json_encode($schedule); ?>'>
-                            Sửa
-                        </button>
-                        <a href="?delete=<?php echo $schedule['id']; ?>" 
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Bạn có chắc muốn xóa lịch chiếu này?')">
-                            Xóa
-                        </a>
-                    </td>
-                </tr>
+                                Sửa
+                            </button>
+                            <a href="?delete=<?php echo $schedule['id']; ?>"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Bạn có chắc muốn xóa lịch chiếu này?')">
+                                Xóa
+                            </a>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -114,7 +121,7 @@ $schedules = $scheduleModel->getAllSchedules();
                     <div class="mb-3">
                         <label>Phim</label>
                         <select name="movie_id" class="form-control" required>
-                            <?php foreach($movies as $movie): ?>
+                            <?php foreach ($movies as $movie): ?>
                                 <option value="<?php echo $movie['id']; ?>">
                                     <?php echo $movie['title']; ?>
                                 </option>
@@ -124,7 +131,7 @@ $schedules = $scheduleModel->getAllSchedules();
                     <div class="mb-3">
                         <label>Rạp</label>
                         <select name="theater_id" class="form-control" required>
-                            <?php foreach($theaters as $theater): ?>
+                            <?php foreach ($theaters as $theater): ?>
                                 <option value="<?php echo $theater['id']; ?>">
                                     <?php echo $theater['name']; ?>
                                 </option>
@@ -147,30 +154,30 @@ $schedules = $scheduleModel->getAllSchedules();
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const editButtons = document.querySelectorAll('.edit-schedule');
-    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-    const scheduleForm = document.getElementById('scheduleForm');
-    
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const schedule = JSON.parse(this.dataset.schedule);
-            
-            scheduleForm.id.value = schedule.id;
-            scheduleForm.movie_id.value = schedule.movie_id;
-            scheduleForm.theater_id.value = schedule.theater_id;
-            scheduleForm.show_time.value = schedule.show_time.slice(0, 16);
-            scheduleForm.price.value = schedule.price;
-            
-            scheduleModal.show();
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.edit-schedule');
+        const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+        const scheduleForm = document.getElementById('scheduleForm');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const schedule = JSON.parse(this.dataset.schedule);
+
+                scheduleForm.id.value = schedule.id;
+                scheduleForm.movie_id.value = schedule.movie_id;
+                scheduleForm.theater_id.value = schedule.theater_id;
+                scheduleForm.show_time.value = schedule.show_time.slice(0, 16);
+                scheduleForm.price.value = schedule.price;
+
+                scheduleModal.show();
+            });
+        });
+
+        document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
+            scheduleForm.reset();
+            scheduleForm.id.value = '';
         });
     });
-    
-    document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
-        scheduleForm.reset();
-        scheduleForm.id.value = '';
-    });
-});
 </script>
 
 <?php include '../includes/footer.php'; ?>

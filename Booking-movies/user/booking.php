@@ -27,14 +27,14 @@ $booked_seats_array = array_column($booked_seats, 'seat_number');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $seats = explode(',', $_POST['seats']);
     $success = true;
-    
+
     foreach ($seats as $seat) {
         if (!$bookingModel->createBooking($_SESSION['user_id'], $schedule_id, $seat)) {
             $success = false;
             break;
         }
     }
-    
+
     if ($success) {
         header("Location: profile.php");
         exit();
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h5 class="mb-0">Chọn ghế</h5>
                 </div>
                 <div class="card-body">
-                    <?php if(isset($error)): ?>
+                    <?php if (isset($error)): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
 
@@ -91,12 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <p><strong>Rạp:</strong> <?php echo $schedule['theater_name']; ?></p>
                     <p><strong>Suất chiếu:</strong> <?php echo date('d/m/Y H:i', strtotime($schedule['show_time'])); ?></p>
                     <p><strong>Giá vé:</strong> <?php echo number_format($schedule['price']); ?>đ/ghế</p>
-                    
+
                     <hr>
-                    
+
                     <p><strong>Ghế đã chọn:</strong> <span id="seats-list"></span></p>
                     <p><strong>Tổng tiền:</strong> <span id="total-price">0</span>đ</p>
-                    
+
                     <form method="POST">
                         <input type="hidden" name="seats" id="seats-input">
                         <button type="submit" id="book-button" class="btn btn-primary w-100" disabled>
@@ -109,91 +109,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 
-<style>
-.screen {
-    background: #ccc;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.seats-container {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 10px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.seat {
-    padding: 10px;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.seat.available {
-    background: #e3f2fd;
-    border: 1px solid #90caf9;
-}
-
-.seat.booked {
-    background: #ffebee;
-    border: 1px solid #ef9a9a;
-    cursor: not-allowed;
-}
-
-.seat.selected {
-    background: #c8e6c9;
-    border: 1px solid #81c784;
-}
-
-.seat-legend {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.seat-legend .seat {
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-    margin-right: 5px;
-}
-</style>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const seats = document.querySelectorAll('.seat.available');
-    const selectedSeats = new Set();
-    const pricePerSeat = <?php echo $schedule['price']; ?>;
-    
-    seats.forEach(seat => {
-        seat.addEventListener('click', function() {
-            const seatNumber = this.dataset.seat;
-            
-            if (this.classList.contains('selected')) {
-                this.classList.remove('selected');
-                selectedSeats.delete(seatNumber);
-            } else {
-                this.classList.add('selected');
-                selectedSeats.add(seatNumber);
-            }
-            
-            updateBookingForm();
+    document.addEventListener('DOMContentLoaded', function() {
+        const seats = document.querySelectorAll('.seat.available');
+        const selectedSeats = new Set();
+        const pricePerSeat = <?php echo $schedule['price']; ?>;
+
+        seats.forEach(seat => {
+            seat.addEventListener('click', function() {
+                const seatNumber = this.dataset.seat;
+
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    selectedSeats.delete(seatNumber);
+                } else {
+                    this.classList.add('selected');
+                    selectedSeats.add(seatNumber);
+                }
+
+                updateBookingForm();
+            });
         });
+
+        function updateBookingForm() {
+            const seatsList = Array.from(selectedSeats).join(', ');
+            const totalPrice = selectedSeats.size * pricePerSeat;
+
+            document.getElementById('seats-list').textContent = seatsList;
+            document.getElementById('total-price').textContent = totalPrice.toLocaleString();
+            document.getElementById('seats-input').value = Array.from(selectedSeats);
+            document.getElementById('book-button').disabled = selectedSeats.size === 0;
+        }
     });
-    
-    function updateBookingForm() {
-        const seatsList = Array.from(selectedSeats).join(', ');
-        const totalPrice = selectedSeats.size * pricePerSeat;
-        
-        document.getElementById('seats-list').textContent = seatsList;
-        document.getElementById('total-price').textContent = totalPrice.toLocaleString();
-        document.getElementById('seats-input').value = Array.from(selectedSeats);
-        document.getElementById('book-button').disabled = selectedSeats.size === 0;
-    }
-});
 </script>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>

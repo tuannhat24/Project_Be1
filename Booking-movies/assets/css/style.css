@@ -1,17 +1,18 @@
 /* General Styles */
 body {
-    min-height: 100vh;
+    position: relative;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 footer {
-    margin-top: auto;
+    width: 100%;
 }
 
 /* Card Styles */
 .card-img-top {
-    height: 400px;
+    height: 300px;
     object-fit: cover;
 }
 
@@ -23,9 +24,9 @@ footer {
     -webkit-box-orient: vertical;
 }
 
-/* Movie Schedule Styles */
+/* Schedule styled */
 .date-nav .btn {
-    padding: 10px;
+    padding: 10px 8px;
     margin-bottom: 5px;
 }
 
@@ -177,15 +178,15 @@ footer {
     .card-img-top {
         height: 300px;
     }
-    
+
     .seats-container {
         grid-template-columns: repeat(8, 1fr);
     }
-    
+
     .theater-nav .btn-group {
         flex-wrap: wrap;
     }
-    
+
     .theater-nav .btn {
         margin-bottom: 5px;
     }
@@ -195,13 +196,13 @@ footer {
     .card-img-top {
         height: 250px;
     }
-    
+
     .seats-container {
         grid-template-columns: repeat(6, 1fr);
     }
-    
+
     .seat-legend {
         flex-direction: column;
         align-items: center;
     }
-} 
+}

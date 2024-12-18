@@ -9,8 +9,8 @@ if ($keyword) {
 }
 ?>
 
-<div class="container mt-4">
-    <h2 class="mb-4">Tìm Kiếm Phim</h2>
+<div class="container mt-5 mb-5">
+    <h2 class="mb-5">Tìm Kiếm Phim</h2>
 
     <form method="GET" class="mb-4">
         <div class="input-group">
@@ -61,20 +61,5 @@ if ($keyword) {
         <?php endif; ?>
     <?php endif; ?>
 </div>
-
-<style>
-    .card-img-top {
-        height: 400px;
-        object-fit: cover;
-    }
-
-    .card-title {
-        height: 48px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-</style>
 
 <?php include 'includes/footer.php'; ?>
