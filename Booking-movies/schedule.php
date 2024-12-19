@@ -67,7 +67,7 @@ for ($i = 0; $i < 7; $i++) {
         $current_movie = '';
         foreach ($schedules as $schedule):
             if ($schedule['title'] != $current_movie):
-                if ($current_movie != '') echo '</div></div></div>';
+                if ($current_movie != '') echo '</div></div></div></div></div>';
                 $current_movie = $schedule['title'];
         ?>
                 <div class="card mb-4">

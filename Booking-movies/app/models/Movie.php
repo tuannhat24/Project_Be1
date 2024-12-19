@@ -9,8 +9,7 @@ class Movie extends Database
         if ($status) {
             $sql .= " WHERE status = ?";
         }
-        $sql .= " ORDER BY release_date DESC";
-
+        $sql .= " ORDER BY rates DESC";
         $stmt = self::$connection->prepare($sql);
         if ($status) {
             $stmt->bind_param("s", $status);
