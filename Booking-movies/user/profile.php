@@ -135,8 +135,10 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                     <th>Mã vé</th>
                                     <th>Phim</th>
                                     <th>Rạp</th>
+                                    <th>Phòng</th>
                                     <th>Suất chiếu</th>
                                     <th>Ghế</th>
+                                    <th>Giá vé</th>
                                     <th>Trạng thái</th>
                                 </tr>
                             </thead>
@@ -146,8 +148,16 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                     <td>#<?php echo $booking['id']; ?></td>
                                     <td><?php echo $booking['title']; ?></td>
                                     <td><?php echo $booking['theater_name']; ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($booking['show_time'])); ?></td>
-                                    <td><?php echo $booking['seat_number']; ?></td>
+                                    <td><?php echo $booking['room_name']; ?></td>
+                                    <td>
+                                        <?php 
+                                            $show_datetime = date('d/m/Y', strtotime($booking['show_date'])) . ' ' . 
+                                                   date('H:i', strtotime($booking['show_time']));
+                                            echo $show_datetime;
+                                        ?>
+                                    </td>
+                                    <td><?php echo $booking['seats']; ?></td>
+                                    <td><?php echo number_format($booking['price']); ?>đ</td>
                                     <td>
                                         <?php
                                         $status_text = [
@@ -155,14 +165,26 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                             'confirmed' => 'Đã xác nhận',
                                             'cancelled' => 'Đã hủy'
                                         ];
-                                        echo $status_text[$booking['status']];
+                                        $status_class = [
+                                            'pending' => 'text-warning',
+                                            'confirmed' => 'text-success',
+                                            'cancelled' => 'text-danger'
+                                        ];
                                         ?>
+                                        <span class="<?php echo $status_class[$booking['status']]; ?>">
+                                            <?php echo $status_text[$booking['status']]; ?>
+                                        </span>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
+                    <?php if(empty($bookings)): ?>
+                        <div class="text-center py-3">
+                            <p class="text-muted">Bạn chưa có lịch sử đặt vé nào.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

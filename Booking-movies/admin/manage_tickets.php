@@ -30,7 +30,7 @@ $tickets = $bookingModel->getAllBookings();
 ?>
 
 <div class="container mt-4">
-    <h2>Quản lý vé</h2>
+    <h2 class="mb-4">Quản lý vé</h2>
 
     <?php if (isset($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
@@ -48,8 +48,10 @@ $tickets = $bookingModel->getAllBookings();
                     <th>Người đặt</th>
                     <th>Phim</th>
                     <th>Rạp</th>
+                    <th>Phòng</th>
                     <th>Suất chiếu</th>
                     <th>Ghế</th>
+                    <th>Giá vé</th>
                     <th>Ngày đặt</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
@@ -59,40 +61,43 @@ $tickets = $bookingModel->getAllBookings();
                 <?php foreach ($tickets as $ticket): ?>
                     <tr>
                         <td>#<?php echo $ticket['id']; ?></td>
-                        <td>
-                            <?php echo $ticket['fullname']; ?><br>
-                            <small><?php echo $ticket['phone']; ?></small>
-                        </td>
+                        <td><?php echo $ticket['fullname']; ?></td>
                         <td><?php echo $ticket['title']; ?></td>
                         <td><?php echo $ticket['theater_name']; ?></td>
-                        <td><?php echo date('d/m/Y H:i', strtotime($ticket['show_time'])); ?></td>
-                        <td><?php echo $ticket['seat_number']; ?></td>
-                        <td><?php echo date('d/m/Y H:i', strtotime($ticket['booking_date'])); ?></td>
+                        <td><?php echo $ticket['room_name']; ?></td>
                         <td>
-                            <form method="POST" class="status-form">
+                            <?php 
+                                $show_datetime = date('d/m/Y', strtotime($ticket['show_date'])) . ' ' . 
+                                               date('H:i', strtotime($ticket['show_time']));
+                                echo $show_datetime;
+                            ?>
+                        </td>
+                        <td><?php echo $ticket['seats']; ?></td>
+                        <td><?php echo number_format($ticket['price']); ?>đ</td>
+                        <td><?php echo date('d/m/Y H:i', strtotime($ticket['created_at'])); ?></td>
+                        <td>
+                            <form method="POST" class="d-inline">
                                 <input type="hidden" name="update_status">
                                 <input type="hidden" name="booking_id" value="<?php echo $ticket['id']; ?>">
-                                <select name="status" class="form-select form-select-sm"
-                                    onchange="this.form.submit()">
-                                    <option value="pending"
-                                        <?php echo $ticket['status'] == 'pending' ? 'selected' : ''; ?>>
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="pending" <?php echo $ticket['status'] == 'pending' ? 'selected' : ''; ?>>
                                         Đang chờ
                                     </option>
-                                    <option value="confirmed"
-                                        <?php echo $ticket['status'] == 'confirmed' ? 'selected' : ''; ?>>
+                                    <option value="confirmed" <?php echo $ticket['status'] == 'confirmed' ? 'selected' : ''; ?>>
                                         Đã xác nhận
                                     </option>
-                                    <option value="cancelled"
-                                        <?php echo $ticket['status'] == 'cancelled' ? 'selected' : ''; ?>>
+                                    <option value="cancelled" <?php echo $ticket['status'] == 'cancelled' ? 'selected' : ''; ?>>
                                         Đã hủy
                                     </option>
                                 </select>
                             </form>
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-info view-ticket"
-                                data-ticket='<?php echo json_encode($ticket); ?>'>
-                                Chi tiết
+                            <button class="btn btn-info btn-sm view-ticket" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#ticketModal"
+                                    data-ticket='<?php echo json_encode($ticket); ?>'>
+                                <i class="fas fa-eye"></i>
                             </button>
                         </td>
                     </tr>
@@ -102,7 +107,7 @@ $tickets = $bookingModel->getAllBookings();
     </div>
 </div>
 
-<!-- Modal chi tiết vé -->
+<!-- Modal Chi tiết vé -->
 <div class="modal fade" id="ticketModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -110,8 +115,8 @@ $tickets = $bookingModel->getAllBookings();
                 <h5 class="modal-title">Chi tiết vé</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <div id="ticket-details"></div>
+            <div class="modal-body" id="ticket-details">
+                <!-- Nội dung chi tiết vé sẽ được điền bởi JavaScript -->
             </div>
         </div>
     </div>
@@ -127,22 +132,27 @@ $tickets = $bookingModel->getAllBookings();
                 const ticket = JSON.parse(this.dataset.ticket);
                 const details = document.getElementById('ticket-details');
                 const phone = ticket.phone ? ticket.phone : 'Chưa có';
+                const show_datetime = new Date(ticket.show_date + ' ' + ticket.show_time)
+                    .toLocaleString('vi-VN');
+                const created_at = new Date(ticket.created_at).toLocaleString('vi-VN');
 
                 details.innerHTML = `
-                <p><strong>Mã vé:</strong> #${ticket.id}</p>
-                <p><strong>Người đặt:</strong> ${ticket.fullname}</p>
-                <p><strong>Số điện thoại:</strong> ${phone}</p>
-                <p><strong>Email:</strong> ${ticket.email}</p>
-                <p><strong>Phim:</strong> ${ticket.title}</p>
-                <p><strong>Rạp:</strong> ${ticket.theater_name}</p>
-                <p><strong>Suất chiếu:</strong> ${new Date(ticket.show_time).toLocaleString()}</p>
-                <p><strong>Ghế:</strong> ${ticket.seat_number}</p>
-                <p><strong>Ngày đặt:</strong> ${new Date(ticket.booking_date).toLocaleString()}</p>
-                <p><strong>Trạng thái:</strong> ${
-                    ticket.status === 'pending' ? 'Đang chờ' :
-                    ticket.status === 'confirmed' ? 'Đã xác nhận' : 'Đã hủy'
-                }</p>
-            `;
+                    <p><strong>Mã vé:</strong> #${ticket.id}</p>
+                    <p><strong>Người đặt:</strong> ${ticket.fullname}</p>
+                    <p><strong>Số điện thoại:</strong> ${phone}</p>
+                    <p><strong>Email:</strong> ${ticket.email}</p>
+                    <p><strong>Phim:</strong> ${ticket.title}</p>
+                    <p><strong>Rạp:</strong> ${ticket.theater_name}</p>
+                    <p><strong>Phòng:</strong> ${ticket.room_name}</p>
+                    <p><strong>Suất chiếu:</strong> ${show_datetime}</p>
+                    <p><strong>Ghế:</strong> ${ticket.seats}</p>
+                    <p><strong>Giá vé:</strong> ${Number(ticket.price).toLocaleString()}đ</p>
+                    <p><strong>Ngày đặt:</strong> ${created_at}</p>
+                    <p><strong>Trạng thái:</strong> ${
+                        ticket.status === 'pending' ? 'Đang chờ' :
+                        ticket.status === 'confirmed' ? 'Đã xác nhận' : 'Đã hủy'
+                    }</p>
+                `;
 
                 ticketModal.show();
             });
