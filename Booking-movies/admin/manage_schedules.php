@@ -1,6 +1,9 @@
 <?php
-// session_start();
 include '../includes/header.php';
+require_once '../app/models/Room.php';
+
+// Khởi tạo các model
+$roomModel = new Room();
 
 // Kiểm tra đã login hay chưa
 if (!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] === false) {
@@ -16,28 +19,29 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 // Xử lý thêm/sửa lịch chiếu
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $movie_id = $_POST['movie_id'];
-    $theater_id = $_POST['theater_id'];
+    $room_id = $_POST['room_id'];
+    $show_date = $_POST['show_date'];
     $show_time = $_POST['show_time'];
     $price = $_POST['price'];
 
-    if ($_POST['id']) {
+    if (isset($_POST['id'])) {
         // Cập nhật lịch chiếu
-        $existingSchedule = $scheduleModel->getScheduleByMovieTheaterTime($movie_id, $theater_id, $show_time, $price);
-        if ($existingSchedule) {
+        $existingSchedule = $scheduleModel->getScheduleByMovieRoomDateTime($movie_id, $room_id, $show_date, $show_time);
+        if ($existingSchedule && $existingSchedule[0]['id'] != $_POST['id']) {
             $error = "Lịch chiếu này đã tồn tại, không thể sửa!";
-        } else if ($scheduleModel->updateSchedule($_POST['id'], $movie_id, $theater_id, $show_time, $price)) {
+        } else if ($scheduleModel->updateSchedule($_POST['id'], $movie_id, $room_id, $show_date, $show_time, $price)) {
             $success = "Cập nhật lịch chiếu thành công!";
         } else {
             $error = "Có lỗi xảy ra khi cập nhật lịch chiếu!";
         }
     } else {
         // Kiểm tra lịch chiếu đã tồn tại chưa
-        $existingSchedule = $scheduleModel->getScheduleByMovieTheaterTime($movie_id, $theater_id, $show_time, $price);
+        $existingSchedule = $scheduleModel->getScheduleByMovieRoomDateTime($movie_id, $room_id, $show_date, $show_time);
         if ($existingSchedule) {
             $error = "Lịch chiếu này đã tồn tại!";
         } else {
             // Thêm lịch chiếu mới
-            if ($scheduleModel->addSchedule($movie_id, $theater_id, $show_time, $price)) {
+            if ($scheduleModel->addSchedule($movie_id, $room_id, $show_date, $show_time, $price)) {
                 $success = "Thêm lịch chiếu mới thành công!";
             } else {
                 $error = "Có lỗi xảy ra khi thêm lịch chiếu!";
@@ -57,8 +61,8 @@ if (isset($_GET['delete'])) {
 
 // Lấy danh sách phim đang chiếu và sắp chiếu
 $movies = $movieModel->getAllMovies();
-// Lấy danh sách rạp
-$theaters = $theaterModel->getAllTheaters();
+// Lấy danh sách phòng chiếu
+$rooms = $roomModel->getAllRooms();
 // Lấy danh sách lịch chiếu
 $schedules = $scheduleModel->getAllSchedules();
 ?>
@@ -67,11 +71,17 @@ $schedules = $scheduleModel->getAllSchedules();
     <h2>Quản lý lịch chiếu</h2>
 
     <?php if (isset($success)): ?>
-        <div class="alert alert-success"><?php echo $success; ?></div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
+            <?php echo $success; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?php echo $error; ?></div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
+            <?php echo $error; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#scheduleModal">
@@ -85,7 +95,9 @@ $schedules = $scheduleModel->getAllSchedules();
                     <th>ID</th>
                     <th>Phim</th>
                     <th>Rạp</th>
-                    <th>Thời gian chiếu</th>
+                    <th>Phòng</th>
+                    <th>Ngày chiếu</th>
+                    <th>Giờ chiếu</th>
                     <th>Giá vé</th>
                     <th>Thao tác</th>
                 </tr>
@@ -96,7 +108,9 @@ $schedules = $scheduleModel->getAllSchedules();
                         <td><?php echo $schedule['id']; ?></td>
                         <td><?php echo $schedule['movie_title']; ?></td>
                         <td><?php echo $schedule['theater_name']; ?></td>
-                        <td><?php echo date('d/m/Y H:i', strtotime($schedule['show_time'])); ?></td>
+                        <td><?php echo $schedule['room_name']; ?></td>
+                        <td><?php echo date('d/m/Y', strtotime($schedule['show_date'])); ?></td>
+                        <td><?php echo date('H:i', strtotime($schedule['show_time'])); ?></td>
                         <td><?php echo number_format($schedule['price']); ?>đ</td>
                         <td>
                             <button class="btn btn-sm btn-info edit-schedule"
@@ -138,18 +152,22 @@ $schedules = $scheduleModel->getAllSchedules();
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Rạp</label>
-                        <select name="theater_id" class="form-control" required>
-                            <?php foreach ($theaters as $theater): ?>
-                                <option value="<?php echo $theater['id']; ?>">
-                                    <?php echo $theater['name']; ?>
+                        <label>Phòng chiếu</label>
+                        <select name="room_id" class="form-control" required>
+                            <?php foreach ($rooms as $room): ?>
+                                <option value="<?php echo $room['id']; ?>">
+                                    <?php echo $room['name'] . ' - ' . $room['theater_name']; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Thời gian chiếu</label>
-                        <input type="datetime-local" name="show_time" class="form-control" required>
+                        <label>Ngày chiếu</label>
+                        <input type="date" name="show_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Giờ chiếu</label>
+                        <input type="time" name="show_time" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label>Giá vé</label>
@@ -163,30 +181,50 @@ $schedules = $scheduleModel->getAllSchedules();
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const editButtons = document.querySelectorAll('.edit-schedule');
-        const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-        const scheduleForm = document.getElementById('scheduleForm');
+document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý thông báo tự động ẩn sau 2s
+    const successAlert = document.getElementById('successAlert');
+    if (successAlert) {
+        setTimeout(function() {
+            const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
+            alert.close();
+        }, 2000);
+    }
 
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const schedule = JSON.parse(this.dataset.schedule);
+    const errorAlert = document.getElementById('errorAlert');
+    if (errorAlert) {
+        setTimeout(function() {
+            const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
+            alert.close();
+        }, 2000);
+    }
 
-                scheduleForm.id.value = schedule.id;
-                scheduleForm.movie_id.value = schedule.movie_id;
-                scheduleForm.theater_id.value = schedule.theater_id;
-                scheduleForm.show_time.value = schedule.show_time.slice(0, 16);
-                scheduleForm.price.value = schedule.price;
+    // Xử lý form sửa lịch chiếu
+    const editButtons = document.querySelectorAll('.edit-schedule');
+    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+    const scheduleForm = document.getElementById('scheduleForm');
 
-                scheduleModal.show();
-            });
-        });
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const schedule = JSON.parse(this.dataset.schedule);
 
-        document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
-            scheduleForm.reset();
-            scheduleForm.id.value = '';
+            scheduleForm.id.value = schedule.id;
+            scheduleForm.movie_id.value = schedule.movie_id;
+            scheduleForm.room_id.value = schedule.room_id;
+            scheduleForm.show_date.value = schedule.show_date;
+            scheduleForm.show_time.value = schedule.show_time;
+            scheduleForm.price.value = schedule.price;
+
+            scheduleModal.show();
         });
     });
+
+    // Reset form khi thêm mới
+    document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
+        scheduleForm.reset();
+        scheduleForm.id.value = '';
+    });
+});
 </script>
 
 <?php include '../includes/footer.php'; ?>

@@ -11,22 +11,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $user = $userModel->login($username, $password);
+    $result = $userModel->login($username, $password);
 
-    if ($user) {
+    if (is_array($result) && isset($result['error'])) {
+        $error = $result['error'];
+    } else if ($result) {
+        $_SESSION['user_id'] = $result['id'];
+        $_SESSION['username'] = $result['username'];
+        $_SESSION['role'] = $result['role'];
         $_SESSION['isLoggedIn'] = true;
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
 
-        if ($user['role'] == 'admin') {
-            header("Location: ../admin/manage_movies.php");
-        } else {
-            header("Location: ../");
-        }
+        header("Location: index.php");
         exit();
     } else {
-        $_SESSION['notification'] = "Tài khoản hoặc mật khẩu không chính xác!";
+        $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
     }
 }
 ?>

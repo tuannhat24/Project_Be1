@@ -60,9 +60,10 @@ if (isset($_SESSION['user_id'])) {
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_schedules.php') echo 'selected'; ?>>Manage Schedules</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_tickets.php"
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_tickets.php') echo 'selected'; ?>>Manage Tickets</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_users.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_users.php') echo 'selected'; ?>>Manage Users</option>
                                 </select>
                             </li>
-                            }
                         <?php endif; ?>
 
                         <li class="nav-item">

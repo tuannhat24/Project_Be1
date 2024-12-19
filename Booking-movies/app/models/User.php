@@ -11,8 +11,18 @@ class User extends Database
         
         $result = $this->select($stmt);
         
-        if (count($result) > 0 && password_verify($password, $result[0]['password'])) {
-            return $result[0];
+        if (count($result) > 0) {
+            $user = $result[0];
+            
+            // Kiểm tra tài khoản có bị khóa không
+            if (isset($user['status']) && $user['status'] == 'blocked') {
+                return ['error' => 'Tài khoản của bạn đã bị khóa'];
+            }
+            
+            // Kiểm tra mật khẩu
+            if (password_verify($password, $user['password'])) {
+                return $user;
+            }
         }
         return false;
     }
@@ -79,10 +89,72 @@ class User extends Database
 
     public function getAllUsers() 
     {
-        $sql = "SELECT id, username, email, fullname, phone, role, created_at 
+        $sql = "SELECT id, username, email, fullname, phone, role, status, created_at 
                 FROM users ORDER BY created_at DESC";
         $stmt = self::$connection->prepare($sql);
         
         return $this->select($stmt);
+    }
+
+    public function updateUserStatus($user_id, $status) 
+    {
+        try {
+            // Debug
+            error_log("Updating user status: ID=$user_id, Status=$status");
+            
+            // Kiểm tra status hợp lệ
+            if (!in_array($status, ['active', 'blocked'])) {
+                error_log("Invalid status: $status");
+                return false;
+            }
+            
+            // Không cho phép khóa tài khoản admin
+            $user = $this->getUserById($user_id);
+            if (!$user || $user[0]['role'] == 'admin') {
+                error_log("Cannot block admin account");
+                return false;
+            }
+            
+            $sql = "UPDATE users SET status = ? WHERE id = ?";
+            $stmt = self::$connection->prepare($sql);
+            $stmt->bind_param("si", $status, $user_id);
+            
+            $result = $stmt->execute();
+            error_log("Update result: " . ($result ? "success" : "failed"));
+            return $result;
+            
+        } catch (Exception $e) {
+            error_log("Error updating user status: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateUserByAdmin($user_id, $email, $fullname, $phone, $role) 
+    {
+        // Kiểm tra email đã tồn tại chưa (trừ email hiện tại của user)
+        $check_sql = "SELECT id FROM users WHERE email = ? AND id != ?";
+        $check_stmt = self::$connection->prepare($check_sql);
+        $check_stmt->bind_param("si", $email, $user_id);
+        $check_result = $this->select($check_stmt);
+        
+        if (count($check_result) > 0) {
+            return false;
+        }
+        
+        // Kiểm tra role hợp lệ
+        if (!in_array($role, ['admin', 'user'])) {
+            return false;
+        }
+        
+        // Không cho phép thay đổi role của chính mình
+        if ($user_id == $_SESSION['user_id']) {
+            $role = $_SESSION['role'];
+        }
+        
+        $sql = "UPDATE users SET email = ?, fullname = ?, phone = ?, role = ? WHERE id = ?";
+        $stmt = self::$connection->prepare($sql);
+        $stmt->bind_param("ssssi", $email, $fullname, $phone, $role, $user_id);
+        
+        return $stmt->execute();
     }
 } 
