@@ -57,12 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?php endif; ?>
 
                     <div class="text-center mb-4">
-                        <div class="screen">Màn hình</div>
+                        <div class="screen">
+                            <p>Màn hình</p>
+                        </div>
                     </div>
 
                     <div class="seats-container">
+                        <div class="seat-area"></div>
                         <?php
-                        $total_seats = 50; // Có thể thay đổi theo số ghế của rạp
+                        $total_seats = 120; // Có thể thay đổi theo số ghế của rạp
                         for ($i = 1; $i <= $total_seats; $i++) {
                             $seat_class = in_array($i, $booked_seats_array) ? 'booked' : 'available';
                             echo "<div class='seat $seat_class' data-seat='$i'>$i</div>";
@@ -72,9 +75,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="mt-3">
                         <div class="seat-legend">
-                            <span class="seat available"></span> Ghế trống
-                            <span class="seat booked"></span> Đã đặt
-                            <span class="seat selected"></span> Đang chọn
+                            <span class="seat available"></span>Ghế trống
+                            <span class="seat booked"></span>Đã đặt
+                            <span class="seat selected"></span>Đang chọn
+                            <span class="seat center_area"></span>Vùng trung tâm
                         </div>
                     </div>
                 </div>

@@ -310,46 +310,98 @@ a {
 
 /* Seat selection styles */
 .screen {
-    background: linear-gradient(45deg, #032055, #043277);
-    color: white;
-    padding: 20px;
+    width: 40%;
+    height: 15px;
+    background-color: #000;
+    margin: 40px auto;
     border-radius: 10px;
-    margin-bottom: 30px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.screen p {
+    position: absolute;
+    margin: 20px;
+    left: 34%;
 }
 
 .seats-container {
-    gap: 15px;
+    background-color: #000;
+    display: flex;
+    width: 600px;
+    padding: 50px;
+    margin-left: 8%;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 30px;
+    position: relative;
+}
+
+.seat-area {
+    border: 2px solid rgb(143, 230, 165);
     padding: 20px;
+    position: absolute;
+    top: 210px;
+    left: 30%;
+    right: 30%;
+    bottom: 210px;
+    z-index: 1;
+    box-sizing: border-box;
 }
 
 .seat {
-    border-radius: 10px;
-    padding: 15px;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    background-color: #a1a1a1;
+    cursor: pointer;
+    text-align: center;
+    z-index: 1;
+    line-height: 30px;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
 }
 
 .seat.available {
-    background: #fff;
-    border: 2px solid #e3e3e3;
-}
-
-.seat.available:hover {
-    background: #f8f9fa;
-    border-color: var(--primary-color);
-}
-
-.seat.selected {
-    background: var(--primary-color);
-    color: white;
-    border: 2px solid var(--primary-color);
+    background-color: rgb(114, 46, 209);
 }
 
 .seat.booked {
-    background: #ffebee;
-    border: 2px solid #ffcdd2;
+    background-color: rgb(64, 64, 64);
+    pointer-events: none;
+}
+
+.seat.selected {
+    background-color: #ca0707;
+}
+
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.seat-legend .available {
+    background-color: rgb(114, 46, 209);
+}
+
+.seat-legend .booked {
+    margin-left: 20px;
+    background-color: rgb(64, 64, 64);
+}
+
+.seat.center_area {
+    margin-left: 20px;
+    border: 2px solid rgb(143, 230, 165);
+    background-color: #fff;
+}
+
+.seat-legend .selected {
+    margin-left: 20px;
+    background-color: #ca0707;
 }
 
 /* Footer styles */
