@@ -7,6 +7,23 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     exit();
 }
 
+// Xử lý cập nhật vai trò
+if (isset($_POST['update_user'])) {
+    $user_id = $_POST['user_id'];
+    $role = $_POST['role'];
+    
+    // Không cho phép thay đổi role của chính mình
+    if ($user_id == $_SESSION['user_id']) {
+        $error = "Không thể thay đổi vai trò của chính mình!";
+    } else {
+        if ($userModel->updateUserRole($user_id, $role)) {
+            $success = "Cập nhật vai trò thành công!";
+        } else {
+            $error = "Có lỗi xảy ra khi cập nhật vai trò!";
+        }
+    }
+}
+
 // Xử lý khóa/mở khóa tài khoản
 if (isset($_POST['update_status'])) {
     $user_id = $_POST['user_id'];
@@ -19,21 +36,6 @@ if (isset($_POST['update_status'])) {
         $success = "Cập nhật trạng thái tài khoản thành công!";
     } else {
         $error = "Có lỗi xảy ra khi cập nhật trạng thái tài khoản!";
-    }
-}
-
-// Xử lý cập nhật thông tin user
-if (isset($_POST['update_user'])) {
-    $user_id = $_POST['user_id'];
-    $email = $_POST['email'];
-    $fullname = $_POST['fullname'];
-    $phone = $_POST['phone'];
-    $role = $_POST['role'];
-    
-    if ($userModel->updateUserByAdmin($user_id, $email, $fullname, $phone, $role)) {
-        $success = "Cập nhật thông tin người dùng thành công!";
-    } else {
-        $error = "Có lỗi xảy ra khi cập nhật thông tin người dùng!";
     }
 }
 
@@ -83,7 +85,7 @@ $users = $userModel->getAllUsers();
                         <td>
                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
                                 <form method="POST" class="d-inline">
-                                    <input type="hidden" name="update_user">
+                                    <input type="hidden" name="update_user" value="1">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                                         <option value="user" <?php echo $user['role'] == 'user' ? 'selected' : ''; ?>>

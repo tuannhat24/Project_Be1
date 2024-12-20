@@ -157,4 +157,41 @@ class User extends Database
         
         return $stmt->execute();
     }
+
+    public function updateUserRole($user_id, $role) 
+    {
+        try {
+            // Kiểm tra role hợp lệ
+            if (!in_array($role, ['admin', 'user'])) {
+                return false;
+            }
+            
+            // Lấy thông tin user hiện tại
+            $user = $this->getUserById($user_id);
+            if (!$user) {
+                return false;
+            }
+            
+            // Cập nhật role nhưng giữ nguyên các thông tin khác
+            $sql = "UPDATE users 
+                    SET role = ?,
+                        email = ?,
+                        fullname = ?,
+                        phone = ?
+                    WHERE id = ?";
+                    
+            $stmt = self::$connection->prepare($sql);
+            $email = $user[0]['email'];
+            $fullname = $user[0]['fullname'];
+            $phone = $user[0]['phone'];
+            
+            $stmt->bind_param("ssssi", $role, $email, $fullname, $phone, $user_id);
+            
+            return $stmt->execute();
+            
+        } catch (Exception $e) {
+            error_log("Error updating user role: " . $e->getMessage());
+            return false;
+        }
+    }
 } 
