@@ -194,18 +194,4 @@ class User extends Database
             return false;
         }
     }
-
-    public function getTotalUsers() {
-        $sql = "SELECT COUNT(*) as total FROM users";
-        $stmt = self::$connection->prepare($sql);
-        $result = $this->select($stmt);
-        return $result[0]['total'];
-    }
-
-    public function getUsersWithPagination($offset, $limit) {
-        $sql = "SELECT * FROM users ORDER BY created_at DESC LIMIT ?, ?";
-        $stmt = self::$connection->prepare($sql);
-        $stmt->bind_param("ii", $offset, $limit);
-        return $this->select($stmt);
-    }
 } 

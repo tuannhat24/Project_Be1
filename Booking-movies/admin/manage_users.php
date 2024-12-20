@@ -39,19 +39,8 @@ if (isset($_POST['update_status'])) {
     }
 }
 
-// Thêm vào đầu file
-require_once '../app/common/Pagination.php';
-
-// Lấy tổng số users
-$totalUsers = $userModel->getTotalUsers();
-
-// Khởi tạo phân trang
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
-$itemsPerPage = 5; 
-$pagination = new Pagination($totalUsers, $itemsPerPage, $page);
-
-// Lấy danh sách users có phân trang
-$users = $userModel->getUsersWithPagination($pagination->getOffset(), $pagination->getLimit());
+// Lấy danh sách users
+$users = $userModel->getAllUsers();
 ?>
 
 <div class="container mt-4">
@@ -135,8 +124,6 @@ $users = $userModel->getUsersWithPagination($pagination->getOffset(), $paginatio
             </tbody>
         </table>
     </div>
-
-    <?php echo $pagination->createLinks('/Project_Be1/Booking-movies/admin/manage_users.php'); ?>
 </div>
 
 <?php include '../includes/footer.php'; ?>
