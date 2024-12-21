@@ -1,0 +1,65 @@
+.featured-movie-slide {
+    height: 600px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.featured-movie-content {
+    color: white;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.featured-movie-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.movie-description {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.movie-info {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 1rem;
+}
+
+.rating {
+    color: #ffd700;
+}
+
+.carousel-indicators {
+    bottom: 30px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+@media (max-width: 768px) {
+    .featured-movie-slide {
+        height: 300px;
+    }
+    
+    .featured-movie-content h1 {
+        font-size: 2rem;
+    }
+    
+    .movie-description {
+        font-size: 1rem;
+    }
+}

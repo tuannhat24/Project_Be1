@@ -6,7 +6,53 @@ $showing_movies = $movieModel->getAllMovies('now_showing');
 
 // Lấy danh sách phim sắp chiếu
 $coming_movies = $movieModel->getAllMovies('coming_soon');
+
+// Lấy 5 phim nổi bật (có rating cao nhất)
+$featured_movies = array_slice($showing_movies, 0, 5);
 ?>
+
+<div class="container-fluid p-0">
+    <!-- Slider phim nổi bật -->
+    <div id="featuredMovies" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <?php for($i = 0; $i < count($featured_movies); $i++): ?>
+                <button type="button" data-bs-target="#featuredMovies" data-bs-slide-to="<?php echo $i; ?>" 
+                    <?php echo $i === 0 ? 'class="active"' : ''; ?>></button>
+            <?php endfor; ?>
+        </div>
+        
+        <div class="carousel-inner">
+            <?php foreach($featured_movies as $index => $movie): ?>
+                <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+                    <div class="featured-movie-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./assets/img/<?php echo $movie['banner'] ?? $movie['poster']; ?>');">
+                        <div class="container">
+                            <div class="featured-movie-content">
+                                <h1><?php echo $movie['title']; ?></h1>
+                                <p class="movie-description"><?php echo substr($movie['description'], 0, 200); ?>...</p>
+                                <div class="movie-info">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i> <?php echo $movie['rates']; ?>
+                                    </span>
+                                    <span class="duration"><?php echo $movie['duration']; ?> phút</span>
+                                </div>
+                                <a href="movie.php?id=<?php echo $movie['id']; ?>" class="btn btn-primary mt-3">
+                                    Đặt vé ngay
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredMovies" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredMovies" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</div>
 
 <div class="container mt-4 home-page">
     <!-- Phim đang chiếu -->
@@ -61,5 +107,15 @@ $coming_movies = $movieModel->getAllMovies('coming_soon');
         <?php endforeach; ?>
     </div>
 </div>
+
+<!-- Thêm script cho auto slide -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myCarousel = new bootstrap.Carousel(document.getElementById('featuredMovies'), {
+        interval: 5000, // Thời gian chuyển slide (5 giây)
+        wrap: true
+    });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>
