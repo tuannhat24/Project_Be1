@@ -321,7 +321,7 @@ a {
 .screen p {
     position: absolute;
     margin: 20px;
-    left: 34%;
+    left: 31%;
 }
 
 .seats-container {
@@ -329,6 +329,7 @@ a {
     display: flex;
     width: 600px;
     padding: 50px;
+    border-radius: 10px;
     margin-left: 8%;
     flex-wrap: wrap;
     justify-content: center;
@@ -340,10 +341,10 @@ a {
     border: 2px solid rgb(143, 230, 165);
     padding: 20px;
     position: absolute;
-    top: 210px;
+    top: 170px;
     left: 30%;
     right: 30%;
-    bottom: 210px;
+    bottom: 170px;
     z-index: 1;
     box-sizing: border-box;
 }

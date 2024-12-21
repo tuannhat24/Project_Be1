@@ -15,7 +15,7 @@ if (isset($_POST['update_profile'])) {
     $email = $_POST['email'];
     $fullname = $_POST['fullname'];
     $phone = $_POST['phone'];
-    
+
     if ($userModel->updateProfile($user_id, $email, $fullname, $phone)) {
         $success = "Cập nhật thông tin thành công!";
         $user['email'] = $email;
@@ -31,7 +31,7 @@ if (isset($_POST['change_password'])) {
     $old_password = $_POST['old_password'];
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
-    
+
     if ($new_password !== $confirm_password) {
         $password_error = "Mật khẩu xác nhận không khớp!";
     } else if ($userModel->changePassword($user_id, $old_password, $new_password)) {
@@ -53,11 +53,11 @@ $bookings = $bookingModel->getUserBookings($user_id);
                     <h5 class="mb-0">Thông tin cá nhân</h5>
                 </div>
                 <div class="card-body">
-                    <?php if(isset($success)): ?>
+                    <?php if (isset($success)): ?>
                         <div class="alert alert-success"><?php echo $success; ?></div>
                     <?php endif; ?>
-                    
-                    <?php if(isset($error)): ?>
+
+                    <?php if (isset($error)): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
 
@@ -69,18 +69,18 @@ $bookings = $bookingModel->getUserBookings($user_id);
                         </div>
                         <div class="mb-3">
                             <label>Email</label>
-                            <input type="email" name="email" class="form-control" 
-                                   value="<?php echo $user['email']; ?>" required>
+                            <input type="email" name="email" class="form-control"
+                                value="<?php echo $user['email']; ?>" required>
                         </div>
                         <div class="mb-3">
                             <label>Họ tên</label>
-                            <input type="text" name="fullname" class="form-control" 
-                                   value="<?php echo $user['fullname']; ?>" required>
+                            <input type="text" name="fullname" class="form-control"
+                                value="<?php echo $user['fullname']; ?>" required>
                         </div>
                         <div class="mb-3">
                             <label>Số điện thoại</label>
-                            <input type="tel" name="phone" class="form-control" 
-                                   value="<?php echo $user['phone']; ?>" required>
+                            <input type="tel" name="phone" class="form-control"
+                                value="<?php echo $user['phone']; ?>" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
                     </form>
@@ -92,11 +92,11 @@ $bookings = $bookingModel->getUserBookings($user_id);
                     <h5 class="mb-0">Đổi mật khẩu</h5>
                 </div>
                 <div class="card-body">
-                    <?php if(isset($password_success)): ?>
+                    <?php if (isset($password_success)): ?>
                         <div class="alert alert-success"><?php echo $password_success; ?></div>
                     <?php endif; ?>
-                    
-                    <?php if(isset($password_error)): ?>
+
+                    <?php if (isset($password_error)): ?>
                         <div class="alert alert-danger"><?php echo $password_error; ?></div>
                     <?php endif; ?>
 
@@ -108,13 +108,13 @@ $bookings = $bookingModel->getUserBookings($user_id);
                         </div>
                         <div class="mb-3">
                             <label>Mật khẩu mới</label>
-                            <input type="password" name="new_password" class="form-control" 
-                                   minlength="6" required>
+                            <input type="password" name="new_password" class="form-control"
+                                minlength="6" required>
                         </div>
                         <div class="mb-3">
                             <label>Xác nhận mật khẩu mới</label>
-                            <input type="password" name="confirm_password" class="form-control" 
-                                   minlength="6" required>
+                            <input type="password" name="confirm_password" class="form-control"
+                                minlength="6" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
                     </form>
@@ -143,44 +143,44 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($bookings as $booking): ?>
-                                <tr>
-                                    <td>#<?php echo $booking['id']; ?></td>
-                                    <td><?php echo $booking['title']; ?></td>
-                                    <td><?php echo $booking['theater_name']; ?></td>
-                                    <td><?php echo $booking['room_name']; ?></td>
-                                    <td>
-                                        <?php 
-                                            $show_datetime = date('d/m/Y', strtotime($booking['show_date'])) . ' ' . 
-                                                   date('H:i', strtotime($booking['show_time']));
+                                <?php foreach ($bookings as $booking): ?>
+                                    <tr>
+                                        <td>#<?php echo $booking['id']; ?></td>
+                                        <td><?php echo $booking['title']; ?></td>
+                                        <td><?php echo $booking['theater_name']; ?></td>
+                                        <td><?php echo $booking['room_name']; ?></td>
+                                        <td>
+                                            <?php
+                                            $show_datetime = date('d/m/Y', strtotime($booking['show_date'])) . ' ' .
+                                                date('H:i', strtotime($booking['show_time']));
                                             echo $show_datetime;
-                                        ?>
-                                    </td>
-                                    <td><?php echo $booking['seats']; ?></td>
-                                    <td><?php echo number_format($booking['price']); ?>đ</td>
-                                    <td>
-                                        <?php
-                                        $status_text = [
-                                            'pending' => 'Đang chờ',
-                                            'confirmed' => 'Đã xác nhận',
-                                            'cancelled' => 'Đã hủy'
-                                        ];
-                                        $status_class = [
-                                            'pending' => 'text-warning',
-                                            'confirmed' => 'text-success',
-                                            'cancelled' => 'text-danger'
-                                        ];
-                                        ?>
-                                        <span class="<?php echo $status_class[$booking['status']]; ?>">
-                                            <?php echo $status_text[$booking['status']]; ?>
-                                        </span>
-                                    </td>
-                                </tr>
+                                            ?>
+                                        </td>
+                                        <td><?php echo $booking['seat_codes']; ?></td>
+                                        <td><?php echo number_format($booking['price']); ?>đ</td>
+                                        <td>
+                                            <?php
+                                            $status_text = [
+                                                'pending' => 'Đang chờ',
+                                                'confirmed' => 'Đã xác nhận',
+                                                'cancelled' => 'Đã hủy'
+                                            ];
+                                            $status_class = [
+                                                'pending' => 'text-warning',
+                                                'confirmed' => 'text-success',
+                                                'cancelled' => 'text-danger'
+                                            ];
+                                            ?>
+                                            <span class="<?php echo $status_class[$booking['status']]; ?>">
+                                                <?php echo $status_text[$booking['status']]; ?>
+                                            </span>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
-                    <?php if(empty($bookings)): ?>
+                    <?php if (empty($bookings)): ?>
                         <div class="text-center py-3">
                             <p class="text-muted">Bạn chưa có lịch sử đặt vé nào.</p>
                         </div>
@@ -191,4 +191,4 @@ $bookings = $bookingModel->getUserBookings($user_id);
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>

@@ -11,8 +11,27 @@ if (!isset($_GET['schedule_id'])) {
     exit();
 }
 
+$user = $userModel->getUserById($_SESSION['user_id']);
+$customer_name = $user[0]['fullname'];
+$customer_email = $user[0]['email'];
+$customer_phone = $user[0]['phone'];
+
 $schedule_id = $_GET['schedule_id'];
 $schedule_details = $scheduleModel->getScheduleById($schedule_id);
+
+$room_id = $schedule_details[0]['room_id'];
+$room = $roomModel->getRoomById($room_id);
+$total_seats = $room['capacity'];
+
+$seats = $seatModel->getAllSeatsByRoom($room_id);
+$seat_codes = [];
+$seat_statuses = [];
+$seat_ids = [];
+foreach ($seats as $seat) {
+    $seat_codes[] = $seat['seat_row'] . $seat['seat_number'];
+    $seat_statuses[] = $seat['status'];
+    $seat_ids[] = $seat['id'];
+}
 
 if (empty($schedule_details)) {
     header("Location: ../");
@@ -21,23 +40,39 @@ if (empty($schedule_details)) {
 
 $schedule = $schedule_details[0];
 $booked_seats = $bookingModel->getBookedSeats($schedule_id);
-$booked_seats_array = array_column($booked_seats, 'seat_number');
+$booked_seats_array = array_column($booked_seats, 'seat_id');
 
 // Xử lý đặt vé
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $seats = explode(',', $_POST['seats']);
+    $payment_method = $_POST['payment_method'];
+    $total_price = count($seats) * $schedule['price'];
+    $seat_price = $schedule['price'];
+
     $success = true;
 
-    foreach ($seats as $seat) {
-        if (!$bookingModel->createBooking($_SESSION['user_id'], $schedule_id, $seat)) {
-            $success = false;
-            break;
-        }
+    if (!$bookingModel->createBooking(
+        $_SESSION['user_id'],
+        $schedule_id,
+        $seats,
+        $total_price,
+        $seat_price,
+        $payment_method,
+        $customer_name,
+        $customer_email,
+        $customer_phone
+    )) {
+        $success = false;
     }
 
     if ($success) {
-        header("Location: profile.php");
-        exit();
+        if ($payment_method === 'momo') {
+            header("Location: momo_payment.php?booking_id=" . $bookingModel->getLastBookingId());
+            exit();
+        } else {
+            header("Location: profile.php");
+            exit();
+        }
     } else {
         $error = "Có lỗi xảy ra khi đặt vé. Vui lòng thử lại!";
     }
@@ -65,12 +100,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="seats-container">
                         <div class="seat-area"></div>
                         <?php
-                        $total_seats = 120; // Có thể thay đổi theo số ghế của rạp
-                        for ($i = 1; $i <= $total_seats; $i++) {
-                            $seat_class = in_array($i, $booked_seats_array) ? 'booked' : 'available';
-                            echo "<div class='seat $seat_class' data-seat='$i'>$i</div>";
+                        for ($i = 0; $i < $total_seats; $i++) {
+                            $j = $i + 1;
+                            $seat_class = '';
+                            switch ($seat_statuses[$i]) {
+                                case 'booked':
+                                    $seat_class = 'booked';
+                                    break;
+                                case 'available':
+                                    $seat_class = 'available';
+                                    break;
+                                case 'unavailable':
+                                    $seat_class = 'unavailable';
+                                    break;
+                                default:
+                                    $seat_class = 'unknown';
+                            }
+
+                            echo "<div class='seat $seat_class' data-seat='$seat_codes[$i].$seat_ids[$i]'>$seat_codes[$i]</div>";
                         }
                         ?>
+
                     </div>
 
                     <div class="mt-3">
@@ -100,8 +150,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <p><strong>Ghế đã chọn:</strong> <span id="seats-list"></span></p>
                     <p><strong>Tổng tiền:</strong> <span id="total-price">0</span>đ</p>
-
+                    <p><strong>Phương thức thanh toán:</strong></p>
                     <form method="POST">
+                        <div class="form-group">
+                            <select name="payment_method" class="form-control" id="payment-method">
+                                <option value="cash">Tiền mặt</option>
+                                <option value="momo">Momo</option>
+                            </select>
+                        </div>
                         <input type="hidden" name="seats" id="seats-input">
                         <button type="submit" id="book-button" class="btn btn-primary w-100" disabled>
                             Đặt vé
@@ -136,10 +192,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
 
         function updateBookingForm() {
-            const seatsList = Array.from(selectedSeats).join(', ');
+            const seatsList = Array.from(selectedSeats);
+            const seatDetails = seatsList.map(seatCode => seatCode.split('.')[0]);
+            const seatIds = seatsList.map(seatCode => seatCode.split('.')[1]);
+
             const totalPrice = selectedSeats.size * pricePerSeat;
 
-            document.getElementById('seats-list').textContent = seatsList;
+            document.getElementById('seats-list').textContent = seatDetails;
             document.getElementById('total-price').textContent = totalPrice.toLocaleString();
             document.getElementById('seats-input').value = Array.from(selectedSeats);
             document.getElementById('book-button').disabled = selectedSeats.size === 0;

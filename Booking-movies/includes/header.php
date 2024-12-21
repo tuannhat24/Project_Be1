@@ -7,6 +7,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Booking.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/TheaterModel.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Room.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Seat.php';
 
 // Khởi tạo các đối tượng model
 $userModel = new User();
@@ -14,6 +16,8 @@ $movieModel = new Movie();
 $theaterModel = new TheaterModel();
 $scheduleModel = new Schedule();
 $bookingModel = new Booking();
+$roomModel = new Room();
+$seatModel = new Seat();
 ?>
 
 <?php
