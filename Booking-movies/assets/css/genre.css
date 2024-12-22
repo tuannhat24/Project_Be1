@@ -1,0 +1,198 @@
+/* Filter Section */
+.genre-filter-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+    border: 1px solid black;
+    backdrop-filter: blur(10px);
+}
+
+.genre-filter-section .form-label {
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.genre-filter-section .form-select {
+    background: rgb(203 213 225 / var(--tw-bg-opacity, 1));
+    border: 1px solid rgba(255, 255, 255, 0.795);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #333;
+    transition: all 0.4s ease;
+}
+
+.genre-filter-section .form-select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.genre-filter-section .btn-primary {
+    background: rgb(28 25 23 / var(--tw-bg-opacity, 1));    
+    border: none;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.genre-filter-section .btn-primary:hover {
+    background: rgb(168 162 158 / var(--tw-bg-opacity, 1));
+}
+
+/* Movie Cards */
+.genre-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 20px 0;
+}
+
+.genre-movie-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.genre-movie-card:hover {
+    transform: translateY(-5px);
+}
+
+.genre-movie-img {
+    height: 320px;
+    width: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.genre-movie-card:hover .genre-movie-img {
+    transform: scale(1.1);
+    filter: brightness(0.7);
+}
+
+.genre-movie-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    transform: translateY(100px);
+    transition: all 0.3s ease;
+}
+
+.genre-movie-card:hover .genre-movie-body {
+    transform: translateY(0);
+}
+
+.genre-movie-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 30px;
+}
+
+.genre-movie-text {
+    color: #ccc;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.genre-movie-card:hover .genre-movie-text {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.genre-movie-rating {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--accent-color);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 2;
+}
+
+/* No Results */
+.genre-no-results {
+    color: #333;
+    font-size: 1.2rem;
+    padding: 60px 20px;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .genre-filter-section {
+        padding: 20px;
+    }
+    
+    .genre-movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+    }
+    
+    .genre-movie-img {
+        height: 240px;
+    }
+    
+    .genre-movie-title {
+        font-size: 1rem;
+    }
+}
+
+/* Genre Tags */
+.genre-filter-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--dark-surface);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--dark-text);
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.genre-filter-tag:hover {
+    background: var(--accent-color);
+    color: var(--dark-text);
+    transform: translateY(-2px);
+}
+
+/* Sort Dropdown */
+.genre-sort-dropdown {
+    min-width: 200px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+} 

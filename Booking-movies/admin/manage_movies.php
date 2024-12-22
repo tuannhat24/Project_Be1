@@ -1,5 +1,4 @@
 <?php
-// session_start();
 include '../includes/header.php';
 
 // Kiểm tra đã login hay chưa
@@ -12,6 +11,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     header("Location: /Project_Be1/Booking-movies/");
     exit();
 }
+
+// Lấy danh sách thể loại
+$allGenres = $genreModel->getAllGenres();
 
 // Xử lý thêm/sửa phim
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -35,12 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $movie = $movieModel->getMovieById($id);
     }
 
+    $selectedGenres = $_POST['genres'] ?? [];
 
     if ($id) {
         // Xử lý CẬP NHẬT phim
         $updateResult = $movieModel->updateMovie($id, $title, $description, $duration, $release_date, $status, $poster);
-
         if ($updateResult) {
+            $genreModel->updateMovieGenres($id, $selectedGenres);
             $success = "Cập nhật phim thành công!";
         } else {
             $error = "Có lỗi xảy ra khi cập nhật phim!";
@@ -51,10 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Vui lòng tải lên poster phim!";
         } else {
             $addResult = $movieModel->addMovie($title, $description, $duration, $release_date, $status, $poster);
-
             if ($addResult) {
+                $newMovieId = self::$connection->insert_id;
+                $genreModel->updateMovieGenres($newMovieId, $selectedGenres);
                 $_SESSION['notification'] = "Thêm phim thành công!";
-                header("Location: http://localhost/Project_Be1/Booking-movies/admin/manage_movies.php");
+                header("Location: /Project_Be1/Booking-movies/admin/manage_movies.php");
                 exit();
             } else {
                 $error = "Có lỗi xảy ra khi thêm phim!";
@@ -146,46 +150,93 @@ $movies = $movieModel->getAllMovies();
 
 <!-- Modal thêm/sửa phim -->
 <div class="modal fade" id="movieModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Thêm/Sửa phim</h5>
+                <h5 class="modal-title">Thêm/Sửa Phim</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" enctype="multipart/form-data" id="movieForm">
+                <form id="movieForm" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="movie-id">
-                    <div class="mb-3">
-                        <label>Tên phim</label>
-                        <input type="text" name="title" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Mô tả</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label>Thời lượng (phút)</label>
-                        <input type="number" name="duration" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Ngày khởi chiếu</label>
-                        <input type="date" name="release_date" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Poster</label>
-                        <div class="mb-2">
-                            <img id="poster-preview" src="#" alt="Poster Preview" style="max-height: 150px;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Tên phim</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Thời lượng (phút)</label>
+                                <input type="number" name="duration" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Ngày khởi chiếu</label>
+                                <input type="date" name="release_date" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Trạng thái</label>
+                                <select name="status" class="form-control">
+                                    <option value="now_showing">Đang chiếu</option>
+                                    <option value="coming_soon">Sắp chiếu</option>
+                                    <option value="ended">Đã kết thúc</option>
+                                </select>
+                            </div>
                         </div>
-                        <input type="file" name="poster" class="form-control" accept="image/*">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Poster</label>
+                                <input type="file" name="poster" class="form-control" accept="image/*">
+                                <img id="poster-preview" src="#" alt="Preview" style="max-width: 200px; margin-top: 10px; display: none;">
+                            </div>
+                            <div class="mb-3">
+                                <label>Mô tả</label>
+                                <textarea name="description" class="form-control" rows="4"></textarea>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Phần thể loại -->
                     <div class="mb-3">
-                        <label>Trạng thái</label>
-                        <select name="status" class="form-control">
-                            <option value="now_showing">Đang chiếu</option>
-                            <option value="coming_soon">Sắp chiếu</option>
-                            <option value="ended">Đã kết thúc</option>
-                        </select>
+                        <label>Thể loại</label>
+                        <div class="row">
+                            <?php 
+                            $allGenres = $genreModel->getAllGenres();
+                            $totalGenres = count($allGenres);
+                            $halfCount = ceil($totalGenres / 2);
+                            ?>
+                            
+                            <!-- Cột trái -->
+                            <div class="col-md-6">
+                                <?php for($i = 0; $i < $halfCount; $i++): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="genres[]" 
+                                               value="<?php echo $allGenres[$i]['id']; ?>" 
+                                               id="genre<?php echo $allGenres[$i]['id']; ?>">
+                                        <label class="form-check-label" for="genre<?php echo $allGenres[$i]['id']; ?>">
+                                            <?php echo $allGenres[$i]['name']; ?>
+                                        </label>
+                                    </div>
+                                <?php endfor; ?>
+                            </div>
+                            
+                            <!-- Cột phải -->
+                            <div class="col-md-6">
+                                <?php for($i = $halfCount; $i < $totalGenres; $i++): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="genres[]" 
+                                               value="<?php echo $allGenres[$i]['id']; ?>" 
+                                               id="genre<?php echo $allGenres[$i]['id']; ?>">
+                                        <label class="form-check-label" for="genre<?php echo $allGenres[$i]['id']; ?>">
+                                            <?php echo $allGenres[$i]['name']; ?>
+                                        </label>
+                                    </div>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
                     </div>
+
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </form>
             </div>
@@ -193,45 +244,55 @@ $movies = $movieModel->getAllMovies();
     </div>
 </div>
 
+<!-- Thêm script để xử lý preview ảnh và chọn thể loại khi sửa -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const editButtons = document.querySelectorAll('.edit-movie');
-        const movieModal = new bootstrap.Modal(document.getElementById('movieModal'));
-        const movieForm = document.getElementById('movieForm');
+document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý preview ảnh
+    const posterInput = document.querySelector('input[name="poster"]');
+    const posterPreview = document.getElementById('poster-preview');
+    
+    posterInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                posterPreview.src = e.target.result;
+                posterPreview.style.display = 'block';
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const movie = JSON.parse(this.dataset.movie);
+    // Xử lý khi click nút sửa
+    const editButtons = document.querySelectorAll('.edit-movie');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const movie = JSON.parse(this.dataset.movie);
+            const form = document.getElementById('movieForm');
+            
+            // Điền thông tin phim
+            form.id.value = movie.id;
+            form.title.value = movie.title;
+            form.description.value = movie.description;
+            form.duration.value = movie.duration;
+            form.release_date.value = movie.release_date.split(' ')[0];
+            form.status.value = movie.status;
 
-                movieForm.id.value = movie.id;
-                movieForm.title.value = movie.title;
-                movieForm.description.value = movie.description;
-                movieForm.duration.value = movie.duration;
-                movieForm.release_date.value = movie.release_date.split(' ')[0];
-                movieForm.status.value = movie.status;
+            // Hiển thị poster hiện tại
+            if (movie.poster) {
+                posterPreview.src = '../assets/img/' + movie.poster;
+                posterPreview.style.display = 'block';
+            }
 
-                // Hiển thị hình ảnh poster, nếu có
-                const posterPreview = document.getElementById('poster-preview');
-                if (movie.poster) {
-                    posterPreview.src = '../assets/img/' + movie.poster;
-                    posterPreview.style.display = 'block';
-                } else {
-                    posterPreview.src = '#';
-                    posterPreview.style.display = 'none';
-                }
-
-                movieModal.show();
+            // Đánh dấu các thể loại đã chọn
+            const movieGenres = <?php echo json_encode($movieModel->getMovieGenres($movie['id'] ?? 0)); ?>;
+            const genreIds = movieGenres.map(g => g.id);
+            
+            document.querySelectorAll('input[name="genres[]"]').forEach(checkbox => {
+                checkbox.checked = genreIds.includes(parseInt(checkbox.value));
             });
         });
-
-        document.querySelector('[data-bs-target="#movieModal"]').addEventListener('click', function() {
-            movieForm.reset();
-            movieForm.id.value = '';
-            const posterPreview = document.getElementById('poster-preview');
-            posterPreview.src = '#';
-            posterPreview.style.display = 'none';
-        });
     });
+});
 </script>
 
 <?php include '../includes/footer.php'; ?>
