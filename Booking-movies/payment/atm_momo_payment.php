@@ -41,7 +41,7 @@ $amount = $total_price;
 $orderId = time() . "";
 $redirectUrl = "http://localhost/Project_Be1/Booking-movies/payment/success_result.php";
 $ipnUrl = "http://localhost/Project_Be1/Booking-movies/payment/success_result.php";
-$extraData = "";
+// $extraData = "";
 
 $requestId = time() . "";
 $requestType = "payWithATM";
