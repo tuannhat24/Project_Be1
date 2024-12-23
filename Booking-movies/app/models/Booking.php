@@ -224,7 +224,7 @@ class Booking extends Database
         $sql = "SELECT b.*, u.fullname, u.email, u.phone,
                 m.title, r.name as room_name, t.name as theater_name,
                 s.show_date, s.show_time, s.price,
-                GROUP_CONCAT(bs.seat_id ORDER BY bs.seat_id) as seats
+                GROUP_CONCAT(st.seat_row, st.seat_number ORDER BY st.seat_row, st.seat_number) as seat_codes
                 FROM bookings b
                 JOIN users u ON b.user_id = u.id
                 JOIN schedules s ON b.schedule_id = s.id
@@ -232,6 +232,7 @@ class Booking extends Database
                 JOIN rooms r ON s.room_id = r.id
                 JOIN theaters t ON r.theater_id = t.id
                 JOIN booking_seats bs ON b.id = bs.booking_id
+                JOIN seats st ON bs.seat_id = st.id
                 GROUP BY b.id
                 ORDER BY b.created_at DESC
                 LIMIT ?, ?";

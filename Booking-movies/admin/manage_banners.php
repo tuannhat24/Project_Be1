@@ -32,10 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $image = hash('sha256', time() . rand()) . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
         $path = '../assets/img/' . $image;
-        
+
         if (move_uploaded_file($_FILES['image']['tmp_name'], $path)) {
             $data['image'] = $image;
-            
+
             // Xóa ảnh cũ nếu là cập nhật banner
             if ($id) {
                 $oldBanner = $bannerModel->getBannerById($id);
@@ -52,10 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
     } else if (!$id) {
-        // Yêu cầu hình ảnh khi thêm mới banner
+        // Yêu cầu hình ảnh chỉ khi thêm mới banner
         $_SESSION['error'] = "Vui lòng chọn hình ảnh cho banner!";
         header('Location: manage_banners.php');
         exit();
+    }
+    // Nếu là cập nhật và không có ảnh mới, giữ nguyên ảnh cũ
+    else if ($id) {
+        $oldBanner = $bannerModel->getBannerById($id);
+        if ($oldBanner && $oldBanner['image']) {
+            $data['image'] = $oldBanner['image'];
+        }
     }
 
     if ($id) {
@@ -113,19 +120,31 @@ $movies = $movieModel->getAllMovies();
 <div class="container mt-4">
     <h2>Quản lý Banner</h2>
 
-    <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
-            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <div class="toast-container">
+        <?php if (isset($success)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <?php echo $success; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
 
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
-            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <?php echo $error; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addBannerModal">
         Thêm banner mới
@@ -149,8 +168,8 @@ $movies = $movieModel->getAllMovies();
                     <tr>
                         <td><?php echo $banner['id']; ?></td>
                         <td>
-                            <img src="../assets/img/<?php echo $banner['image']; ?>" 
-                                 alt="Banner" style="max-height: 50px;">
+                            <img src="../assets/img/<?php echo $banner['image']; ?>"
+                                alt="Banner" style="max-height: 50px;">
                         </td>
                         <td><?php echo $banner['title']; ?></td>
                         <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -158,20 +177,20 @@ $movies = $movieModel->getAllMovies();
                         </td>
                         <td>
                             <a href="?toggle_status=<?php echo $banner['id']; ?>&status=<?php echo $banner['status']; ?>"
-                               class="btn btn-sm <?php echo $banner['status'] == 'active' ? 'btn-success' : 'btn-secondary'; ?>">
+                                class="btn btn-sm <?php echo $banner['status'] == 'active' ? 'btn-success' : 'btn-secondary'; ?>">
                                 <?php echo $banner['status'] == 'active' ? 'Hiện' : 'Ẩn'; ?>
-                            </span>
+                                </span>
                         </td>
                         <td><?php echo date('d/m/Y H:i', strtotime($banner['created_at'])); ?></td>
                         <td>
                             <button class="btn btn-sm btn-info edit-banner"
-                                    data-banner='<?php echo json_encode($banner); ?>'
-                                    data-bs-toggle="modal" data-bs-target="#editBannerModal">
+                                data-banner='<?php echo json_encode($banner); ?>'
+                                data-bs-toggle="modal" data-bs-target="#editBannerModal">
                                 Sửa
                             </button>
-                            <a href="?delete=<?php echo $banner['id']; ?>" 
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Bạn có chắc muốn xóa banner này?')">
+                            <a href="?delete=<?php echo $banner['id']; ?>"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Bạn có chắc muốn xóa banner này?')">
                                 Xóa
                             </a>
                         </td>
@@ -211,8 +230,8 @@ $movies = $movieModel->getAllMovies();
                             <div class="mb-3">
                                 <label>Hình Ảnh Banner</label>
                                 <input type="file" name="image" class="form-control" accept="image/*" required>
-                                <img id="add-banner-preview" src="#" alt="Preview" 
-                                     style="max-width: 200px; margin-top: 10px; display: none;">
+                                <img id="add-banner-preview" src="#" alt="Preview"
+                                    style="max-width: 200px; margin-top: 10px; display: none;">
                             </div>
                             <div class="mb-3">
                                 <label>Mô tả</label>
@@ -257,8 +276,8 @@ $movies = $movieModel->getAllMovies();
                                 <label>Hình Ảnh Banner</label>
                                 <input type="file" name="image" class="form-control" accept="image/*">
                                 <small class="text-muted">Để trống nếu không muốn thay đổi hình ảnh</small>
-                                <img id="edit-banner-preview" src="#" alt="Preview" 
-                                     style="max-width: 200px; margin-top: 10px;">
+                                <img id="edit-banner-preview" src="#" alt="Preview"
+                                    style="max-width: 200px; margin-top: 10px;">
                             </div>
                             <div class="mb-3">
                                 <label>Mô tả</label>
@@ -274,56 +293,78 @@ $movies = $movieModel->getAllMovies();
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý preview ảnh khi thêm mới
-    const addImageInput = document.querySelector('#addBannerModal input[name="image"]');
-    const addImagePreview = document.getElementById('add-banner-preview');
-    
-    addImageInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                addImagePreview.src = e.target.result;
-                addImagePreview.style.display = 'block';
-            }
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xử lý preview ảnh khi thêm mới
+        const addImageInput = document.querySelector('#addBannerModal input[name="image"]');
+        const addImagePreview = document.getElementById('add-banner-preview');
 
-    // Xử lý preview ảnh khi sửa
-    const editImageInput = document.querySelector('#editBannerModal input[name="image"]');
-    const editImagePreview = document.getElementById('edit-banner-preview');
-    
-    editImageInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                editImagePreview.src = e.target.result;
-                editImagePreview.style.display = 'block';
-            }
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
-
-    // Xử lý khi click nút sửa
-    const editButtons = document.querySelectorAll('.edit-banner');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const banner = JSON.parse(this.dataset.banner);
-            const form = document.querySelector('#editBannerModal form');
-            
-            form.querySelector('#edit-banner-id').value = banner.id;
-            form.querySelector('#edit-title').value = banner.title;
-            form.querySelector('#edit-description').value = banner.description;
-            form.querySelector('#edit-status').value = banner.status;
-
-            if (banner.image) {
-                editImagePreview.src = '../assets/img/' + banner.image;
-                editImagePreview.style.display = 'block';
+        addImageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addImagePreview.src = e.target.result;
+                    addImagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
             }
         });
+
+        // Xử lý preview ảnh khi sửa
+        const editImageInput = document.querySelector('#editBannerModal input[name="image"]');
+        const editImagePreview = document.getElementById('edit-banner-preview');
+
+        editImageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editImagePreview.src = e.target.result;
+                    editImagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Xử lý khi click nút sửa
+        const editButtons = document.querySelectorAll('.edit-banner');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const banner = JSON.parse(this.dataset.banner);
+                const form = document.querySelector('#editBannerModal form');
+
+                form.querySelector('#edit-banner-id').value = banner.id;
+                form.querySelector('#edit-title').value = banner.title;
+                form.querySelector('#edit-description').value = banner.description;
+                form.querySelector('#edit-status').value = banner.status;
+
+                if (banner.image) {
+                    editImagePreview.src = '../assets/img/' + banner.image;
+                    editImagePreview.style.display = 'block';
+                }
+            });
+        });
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
+        });
     });
-});
 </script>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>

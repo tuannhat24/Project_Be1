@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 if (isset($_POST['update_user'])) {
     $user_id = $_POST['user_id'];
     $role = $_POST['role'];
-    
+
     // Không cho phép thay đổi role của chính mình
     if ($user_id == $_SESSION['user_id']) {
         $error = "Không thể thay đổi vai trò của chính mình!";
@@ -32,10 +32,10 @@ if (isset($_POST['update_user'])) {
 if (isset($_POST['update_status'])) {
     $user_id = $_POST['user_id'];
     $status = $_POST['status'];
-    
+
     // Debug
     error_log("Received update status request: User ID=$user_id, Status=$status");
-    
+
     if ($userModel->updateUserStatus($user_id, $status)) {
         $success = "Cập nhật trạng thái tài khoản thành công!";
     } else {
@@ -58,19 +58,31 @@ $users = $userModel->getUsersWithPagination($pagination->getOffset(), $paginatio
 <div class="container mt-4">
     <h2 class="mb-4">Quản lý người dùng</h2>
 
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
-            <?php echo $success; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <div class="toast-container">
+        <?php if (isset($success)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <?php echo $success; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
-            <?php echo $error; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <?php echo $error; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <div class="table-responsive">
         <table class="table">
@@ -142,23 +154,45 @@ $users = $userModel->getUsersWithPagination($pagination->getOffset(), $paginatio
 <?php include '../includes/footer.php'; ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý thông báo success
-    const successAlert = document.getElementById('successAlert');
-    if (successAlert) {
-        setTimeout(function() {
-            const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
-            alert.close();
-        }, 2000);
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xử lý thông báo success
+        const successAlert = document.getElementById('successAlert');
+        if (successAlert) {
+            setTimeout(function() {
+                const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
+                alert.close();
+            }, 2000);
+        }
 
-    // Xử lý thông báo error
-    const errorAlert = document.getElementById('errorAlert');
-    if (errorAlert) {
-        setTimeout(function() {
-            const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
-            alert.close();
-        }, 2000);
-    }
-});
-</script> 
+        // Xử lý thông báo error
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            setTimeout(function() {
+                const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
+                alert.close();
+            }, 2000);
+        }
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
+        });
+    });
+</script>

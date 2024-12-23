@@ -43,7 +43,45 @@ if (isset($_POST['change_password'])) {
 
 // Lấy lịch sử đặt vé
 $bookings = $bookingModel->getUserBookings($user_id);
+
+if (isset($_POST['cancel_booking'])) {
+    $booking_id = $_POST['cancel_booking'];
+    if ($bookingModel->updateBookingStatus($booking_id, 'cancelled')) {
+        $cancel_success = "Hủy vé thành công!";
+        // Cập nhật lại danh sách đặt vé
+        $bookings = $bookingModel->getUserBookings($user_id);
+    } else {
+        $cancel_error = "Có lỗi xảy ra khi hủy vé!";
+    }
+}
+
 ?>
+
+<div class="toast-container">
+    <?php if (isset($cancel_success)): ?>
+        <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <?php echo $cancel_success; ?>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($cancel_error)): ?>
+        <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <?php echo $cancel_error; ?>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
 
 <div class="container mt-4">
     <div class="row">
@@ -53,14 +91,6 @@ $bookings = $bookingModel->getUserBookings($user_id);
                     <h5 class="mb-0">Thông tin cá nhân</h5>
                 </div>
                 <div class="card-body">
-                    <?php if (isset($success)): ?>
-                        <div class="alert alert-success"><?php echo $success; ?></div>
-                    <?php endif; ?>
-
-                    <?php if (isset($error)): ?>
-                        <div class="alert alert-danger"><?php echo $error; ?></div>
-                    <?php endif; ?>
-
                     <form method="POST">
                         <input type="hidden" name="update_profile">
                         <div class="mb-3">
@@ -140,6 +170,7 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                     <th>Ghế</th>
                                     <th>Giá vé</th>
                                     <th>Trạng thái</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -175,6 +206,16 @@ $bookings = $bookingModel->getUserBookings($user_id);
                                                 <?php echo $status_text[$booking['status']]; ?>
                                             </span>
                                         </td>
+                                        <td>
+                                            <?php if ($booking['status'] != 'cancelled'): ?>
+                                                <form method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy vé này?');">
+                                                    <input type="hidden" name="cancel_booking" value="<?php echo $booking['id']; ?>">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-times"></i> Hủy
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -190,5 +231,34 @@ $bookings = $bookingModel->getUserBookings($user_id);
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Khởi tạo tất cả toast
+    const toastElList = document.querySelectorAll('.toast');
+    const toastList = [...toastElList].map(toastEl => {
+        const toast = new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 3000
+        });
+        toast.show();
+        return toast;
+    });
+
+    // Thêm class show sau khi toast được khởi tạo
+    setTimeout(() => {
+        document.querySelectorAll('.custom-toast').forEach(toast => {
+            toast.classList.add('show');
+        });
+    }, 100);
+
+    // Xử lý animation khi đóng toast
+    toastElList.forEach(toastEl => {
+        toastEl.addEventListener('hide.bs.toast', function() {
+            this.classList.remove('show');
+        });
+    });
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>

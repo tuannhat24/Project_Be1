@@ -77,19 +77,31 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
 <div class="container mt-4">
     <h2>Quản lý lịch chiếu</h2>
 
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
-            <?php echo $success; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <div class="toast-container">
+        <?php if (isset($success)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <?php echo $success; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
-            <?php echo $error; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <?php echo $error; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#scheduleModal">
         Thêm lịch chiếu mới
@@ -189,50 +201,73 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý thông báo tự động ẩn sau 2s
-    const successAlert = document.getElementById('successAlert');
-    if (successAlert) {
-        setTimeout(function() {
-            const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
-            alert.close();
-        }, 2000);
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xử lý thông báo tự động ẩn sau 2s
+        const successAlert = document.getElementById('successAlert');
+        if (successAlert) {
+            setTimeout(function() {
+                const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
+                alert.close();
+            }, 2000);
+        }
 
-    const errorAlert = document.getElementById('errorAlert');
-    if (errorAlert) {
-        setTimeout(function() {
-            const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
-            alert.close();
-        }, 2000);
-    }
+        const errorAlert = document.getElementById('errorAlert');
+        if (errorAlert) {
+            setTimeout(function() {
+                const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
+                alert.close();
+            }, 2000);
+        }
 
-    // Xử lý form sửa lịch chiếu
-    const editButtons = document.querySelectorAll('.edit-schedule');
-    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-    const scheduleForm = document.getElementById('scheduleForm');
+        // Xử lý form sửa lịch chiếu
+        const editButtons = document.querySelectorAll('.edit-schedule');
+        const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+        const scheduleForm = document.getElementById('scheduleForm');
 
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const schedule = JSON.parse(this.dataset.schedule);
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const schedule = JSON.parse(this.dataset.schedule);
 
-            scheduleForm.id.value = schedule.id;
-            scheduleForm.movie_id.value = schedule.movie_id;
-            scheduleForm.room_id.value = schedule.room_id;
-            scheduleForm.show_date.value = schedule.show_date;
-            scheduleForm.show_time.value = schedule.show_time;
-            scheduleForm.price.value = schedule.price;
+                scheduleForm.id.value = schedule.id;
+                scheduleForm.movie_id.value = schedule.movie_id;
+                scheduleForm.room_id.value = schedule.room_id;
+                scheduleForm.show_date.value = schedule.show_date;
+                scheduleForm.show_time.value = schedule.show_time;
+                scheduleForm.price.value = schedule.price;
 
-            scheduleModal.show();
+                scheduleModal.show();
+            });
+        });
+
+        // Reset form khi thêm mới
+        document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
+            scheduleForm.reset();
+            scheduleForm.id.value = '';
+        });
+
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
         });
     });
-
-    // Reset form khi thêm mới
-    document.querySelector('[data-bs-target="#scheduleModal"]').addEventListener('click', function() {
-        scheduleForm.reset();
-        scheduleForm.id.value = '';
-    });
-});
 </script>
 
 <?php include '../includes/footer.php'; ?>

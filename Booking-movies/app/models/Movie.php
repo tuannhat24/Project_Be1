@@ -193,4 +193,8 @@ class Movie extends Database
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
+
+    public function getLastInsertId() {
+        return self::$connection->insert_id;
+    }
 }

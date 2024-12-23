@@ -43,6 +43,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="/Project_Be1/Booking-movies/assets/css/pagination.css">
     <link rel="stylesheet" href="/Project_Be1/Booking-movies/assets/css/banner.css">
     <link rel="stylesheet" href="/Project_Be1/Booking-movies/assets/css/genre.css">
+    <link rel="stylesheet" href="/Project_Be1/Booking-movies/assets/css/notification.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>

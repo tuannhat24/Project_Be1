@@ -1,0 +1,16 @@
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+.custom-toast {
+    min-width: 300px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.custom-toast.show {
+    transform: translateX(0);
+}

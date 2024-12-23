@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $addResult = $movieModel->addMovie($title, $description, $duration, $release_date, $status, $poster);
             if ($addResult) {
-                $newMovieId = self::$connection->insert_id;
+                $newMovieId = $movieModel->getLastInsertId();
                 $genreModel->updateMovieGenres($newMovieId, $selectedGenres);
                 $_SESSION['notification'] = "Thêm phim thành công!";
                 header("Location: /Project_Be1/Booking-movies/admin/manage_movies.php");
@@ -96,19 +96,31 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
 <div class="container mt-4">
     <h2>Quản lý phim</h2>
 
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
-            <?php echo $success; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <div class="toast-container">
+        <?php if (isset($success)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <?php echo $success; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
-            <?php echo $error; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <?php echo $error; ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addMovieModal">
         Thêm phim mới
@@ -121,7 +133,7 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
                     <th>ID</th>
                     <th>Poster</th>
                     <th>Tên phim</th>
-                    <th>Thờ loại</th>
+                    <th>Thể loại</th>
                     <th>Thời lượng</th>
                     <th>Ngày khởi chiếu</th>
                     <th>Trạng thái</th>
@@ -139,9 +151,9 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
                         </td>
                         <td><?php echo $movie['title']; ?></td>
                         <td>
-                            <?php 
+                            <?php
                             $movieGenres = $genreModel->getGenresByMovieId($movie['id']);
-                            $genreNames = array_map(function($genre) {
+                            $genreNames = array_map(function ($genre) {
                                 return $genre['name'];
                             }, $movieGenres);
                             echo implode(', ', $genreNames);
@@ -161,7 +173,8 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
                         </td>
                         <td>
                             <button class="btn btn-sm btn-info edit-movie"
-                                data-movie='<?php echo json_encode($movie); ?>'>
+                                data-movie='<?php echo json_encode($movie); ?>'
+                                data-genres='<?php echo json_encode($movieGenres); ?>'>
                                 Sửa
                             </button>
                             <a href="?delete=<?php echo $movie['id']; ?>"
@@ -389,17 +402,17 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
         // Xử lý khi click nút sửa
         const editButtons = document.querySelectorAll('.edit-movie');
         editButtons.forEach(button => {
-            button.addEventListener('click', async function() {
+            button.addEventListener('click', function() {
                 const movie = JSON.parse(this.dataset.movie);
-                const form = document.getElementById('editMovieForm');
+                const movieGenres = JSON.parse(this.dataset.genres);
                 
-                // Điền thông tin phim
-                form.querySelector('#edit-movie-id').value = movie.id;
-                form.querySelector('#edit-title').value = movie.title;
-                form.querySelector('#edit-description').value = movie.description;
-                form.querySelector('#edit-duration').value = movie.duration;
-                form.querySelector('#edit-release-date').value = movie.release_date.split(' ')[0];
-                form.querySelector('#edit-status').value = movie.status;
+                // Điền thông tin cơ bản của phim
+                document.getElementById('edit-movie-id').value = movie.id;
+                document.getElementById('edit-title').value = movie.title;
+                document.getElementById('edit-description').value = movie.description;
+                document.getElementById('edit-duration').value = movie.duration;
+                document.getElementById('edit-release-date').value = movie.release_date.split(' ')[0];
+                document.getElementById('edit-status').value = movie.status;
 
                 // Hiển thị poster hiện tại
                 if (movie.poster) {
@@ -408,32 +421,46 @@ $movies = $movieModel->getMoviesByPagination($pagination->getOffset(), $paginati
                     editPosterPreview.style.display = 'block';
                 }
 
-                // Lấy và đánh dấu thể loại đã chọn
-                try {
-                    const response = await fetch(`get_movie_genres.php?movie_id=${movie.id}`);
-                    const movieGenres = await response.json();
-                    
-                    // Reset tất cả checkbox
-                    document.querySelectorAll('#editMovieModal input[name="genres[]"]').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    
-                    // Đánh dấu các thể loại đã chọn
-                    movieGenres.forEach(genre => {
-                        const checkbox = document.querySelector(`#edit-genre${genre.id}`);
-                        if (checkbox) {
-                            checkbox.checked = true;
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error fetching movie genres:', error);
-                }
+                // Reset và đánh dấu các thể loại đã chọn
+                document.querySelectorAll('#editMovieModal input[name="genres[]"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                movieGenres.forEach(genre => {
+                    const checkbox = document.querySelector(`#edit-genre${genre.id}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
 
                 // Hiển thị modal
                 new bootstrap.Modal(document.getElementById('editMovieModal')).show();
             });
         });
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
+        });
     });
 </script>
+
 
 <?php include '../includes/footer.php'; ?>
