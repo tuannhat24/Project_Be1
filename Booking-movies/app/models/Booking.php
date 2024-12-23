@@ -138,16 +138,19 @@ class Booking extends Database
     {
         $sql = "SELECT b.*, u.username, u.fullname, u.email, u.phone,
                 m.title, s.show_date, s.show_time, t.name as theater_name, 
-                r.name as room_name, s.price, GROUP_CONCAT(bs.seat_id) as seats
-                FROM bookings b 
-                JOIN users u ON b.user_id = u.id 
-                JOIN schedules s ON b.schedule_id = s.id 
-                JOIN movies m ON s.movie_id = m.id 
-                JOIN rooms r ON s.room_id = r.id
-                JOIN theaters t ON r.theater_id = t.id 
-                LEFT JOIN booking_seats bs ON b.id = bs.booking_id
-                GROUP BY b.id
-                ORDER BY b.created_at DESC";
+                r.name as room_name, s.price, 
+                GROUP_CONCAT(CONCAT(seat_row, seat_number)) as seat_codes
+            FROM bookings b 
+            JOIN users u ON b.user_id = u.id 
+            JOIN schedules s ON b.schedule_id = s.id 
+            JOIN movies m ON s.movie_id = m.id 
+            JOIN rooms r ON s.room_id = r.id
+            JOIN theaters t ON r.theater_id = t.id 
+            LEFT JOIN booking_seats bs ON b.id = bs.booking_id
+            LEFT JOIN seats seat ON bs.seat_id = seat.id
+            WHERE b.status != 'cancelled'
+            GROUP BY b.id
+            ORDER BY b.created_at DESC";
 
         $stmt = self::$connection->prepare($sql);
         return $this->select($stmt);

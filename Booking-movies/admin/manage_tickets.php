@@ -66,13 +66,13 @@ $tickets = $bookingModel->getAllBookings();
                         <td><?php echo $ticket['theater_name']; ?></td>
                         <td><?php echo $ticket['room_name']; ?></td>
                         <td>
-                            <?php 
-                                $show_datetime = date('d/m/Y', strtotime($ticket['show_date'])) . ' ' . 
-                                               date('H:i', strtotime($ticket['show_time']));
-                                echo $show_datetime;
+                            <?php
+                            $show_datetime = date('d/m/Y', strtotime($ticket['show_date'])) . ' ' .
+                                date('H:i', strtotime($ticket['show_time']));
+                            echo $show_datetime;
                             ?>
                         </td>
-                        <td><?php echo $ticket['seats']; ?></td>
+                        <td><?php echo $ticket['seat_codes']; ?></td>
                         <td><?php echo number_format($ticket['price']); ?>đ</td>
                         <td><?php echo date('d/m/Y H:i', strtotime($ticket['created_at'])); ?></td>
                         <td>
@@ -93,10 +93,10 @@ $tickets = $bookingModel->getAllBookings();
                             </form>
                         </td>
                         <td>
-                            <button class="btn btn-info btn-sm view-ticket" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#ticketModal"
-                                    data-ticket='<?php echo json_encode($ticket); ?>'>
+                            <button class="btn btn-info btn-sm view-ticket"
+                                data-bs-toggle="modal"
+                                data-bs-target="#ticketModal"
+                                data-ticket='<?php echo json_encode($ticket); ?>'>
                                 <i class="fas fa-eye"></i>
                             </button>
                         </td>
@@ -145,7 +145,7 @@ $tickets = $bookingModel->getAllBookings();
                     <p><strong>Rạp:</strong> ${ticket.theater_name}</p>
                     <p><strong>Phòng:</strong> ${ticket.room_name}</p>
                     <p><strong>Suất chiếu:</strong> ${show_datetime}</p>
-                    <p><strong>Ghế:</strong> ${ticket.seats}</p>
+                    <p><strong>Ghế:</strong> ${ticket.seat_codes}</p>
                     <p><strong>Giá vé:</strong> ${Number(ticket.price).toLocaleString()}đ</p>
                     <p><strong>Ngày đặt:</strong> ${created_at}</p>
                     <p><strong>Trạng thái:</strong> ${

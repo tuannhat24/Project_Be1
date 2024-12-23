@@ -36,8 +36,8 @@ if ($keyword) {
                             <img src="./assets/img/<?php echo $movie['poster']; ?>" class="card-img-top"
                                 alt="<?php echo $movie['title']; ?>">
                             <div class="card-body">
-                                <h5 class="card-title"><?php echo $movie['title']; ?></h5>
-                                <p class="card-text">
+                                <h5 style="color: #000;" class="card-title"><?php echo $movie['title']; ?></h5>
+                                <p style="color: #777;" class="card-text">
                                     <small>
                                         Thời lượng: <?php echo $movie['duration']; ?> phút<br>
                                         Trạng thái:

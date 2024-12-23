@@ -67,7 +67,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($success) {
         if ($payment_method === 'momo') {
-            header("Location: momo_payment.php?booking_id=" . $bookingModel->getLastBookingId());
+            header("Location: ../payment/momo_payment.php?booking_id=" . $bookingModel->getLastBookingId() . "&total_price=" . $total_price);
+            exit();
+        } else if ($payment_method === 'atm_momo') {
+            header("Location: ../payment/atm_momo_payment.php?booking_id=" . $bookingModel->getLastBookingId() . "&total_price=" . $total_price);
             exit();
         } else {
             header("Location: profile.php");
@@ -155,7 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="form-group">
                             <select name="payment_method" class="form-control" id="payment-method">
                                 <option value="cash">Tiền mặt</option>
-                                <option value="momo">Momo</option>
+                                <option value="momo">QR Momo</option>
+                                <option value="atm_momo">ATM Momo</option>
                             </select>
                         </div>
                         <input type="hidden" name="seats" id="seats-input">
