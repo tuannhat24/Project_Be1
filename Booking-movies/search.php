@@ -9,24 +9,30 @@ if ($keyword) {
 }
 ?>
 
+<link rel="stylesheet" href="assets/css/search.css">
 <div class="container mt-5 mb-5">
-    <h2 class="mb-5">Tìm Kiếm Phim</h2>
+    <div class="search-container text-center">
+        <h2 class="search-title mb-4">Tìm Kiếm Phim</h2>
 
-    <form method="GET" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="keyword" class="form-control"
-                placeholder="Nhập tên phim cần tìm..."
-                value="<?php echo htmlspecialchars($keyword); ?>" required>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Tìm kiếm
-            </button>
-        </div>
-    </form>
+        <form method="GET" class="search-form mb-4">
+            <div class="input-group">
+                <input type="text" name="keyword" class="form-control search-input"
+                    placeholder="Nhập tên phim cần tìm..."
+                    value="<?php echo htmlspecialchars($keyword); ?>">
+                <button type="submit" class="btn btn-primary search-button">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </div>
+        </form>
 
-    <?php if ($keyword): ?>
-        <?php if (empty($movies)): ?>
-            <div class="alert alert-info">
-                Không tìm thấy phim nào phù hợp với từ khóa "<?php echo htmlspecialchars($keyword); ?>".
+        <?php if (!$keyword): ?>
+            <div class="empty-search-message">
+                <img src="assets/img/search-icon.png" alt="Search" class="search-icon mb-2">
+                <p>Bạn chưa tìm kiếm phim nào...</p>
+            </div>
+        <?php elseif (empty($movies)): ?>
+            <div class="no-results-message">
+                <p>Không tìm thấy phim nào phù hợp với từ khóa "<?php echo htmlspecialchars($keyword); ?>"</p>
             </div>
         <?php else: ?>
             <div class="row">
@@ -59,7 +65,7 @@ if ($keyword) {
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-    <?php endif; ?>
+    </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>

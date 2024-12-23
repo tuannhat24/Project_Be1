@@ -177,4 +177,20 @@ class Movie extends Database
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
+
+    public function getTotalMovies() {
+        $sql = "SELECT COUNT(*) as total FROM movies";
+        $result = self::$connection->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+    public function getMoviesByPagination($offset, $limit) {
+        $sql = "SELECT * FROM movies ORDER BY id DESC LIMIT ?, ?";
+        $stmt = self::$connection->prepare($sql);
+        $stmt->bind_param("ii", $offset, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }

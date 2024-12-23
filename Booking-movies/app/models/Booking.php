@@ -209,4 +209,33 @@ class Booking extends Database
         }
         return null;
     }
+
+    public function getTotalBookings() {
+        $sql = "SELECT COUNT(*) as total FROM bookings";
+        $result = self::$connection->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+    public function getBookingsByPagination($offset, $limit) {
+        $sql = "SELECT b.*, u.fullname, u.email, u.phone,
+                m.title, r.name as room_name, t.name as theater_name,
+                s.show_date, s.show_time, s.price,
+                GROUP_CONCAT(bs.seat_id ORDER BY bs.seat_id) as seats
+                FROM bookings b
+                JOIN users u ON b.user_id = u.id
+                JOIN schedules s ON b.schedule_id = s.id
+                JOIN movies m ON s.movie_id = m.id
+                JOIN rooms r ON s.room_id = r.id
+                JOIN theaters t ON r.theater_id = t.id
+                JOIN booking_seats bs ON b.id = bs.booking_id
+                GROUP BY b.id
+                ORDER BY b.created_at DESC
+                LIMIT ?, ?";
+        $stmt = self::$connection->prepare($sql);
+        $stmt->bind_param("ii", $offset, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }

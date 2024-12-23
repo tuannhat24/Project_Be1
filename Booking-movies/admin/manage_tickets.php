@@ -1,6 +1,7 @@
 <?php
 // session_start();
 include '../includes/header.php';
+require_once '../app/common/Pagination.php';
 
 // Kiểm tra đã login hay chưa
 if (!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] === false) {
@@ -25,19 +26,30 @@ if (isset($_POST['update_status'])) {
     }
 }
 
-// Lấy danh sách vé
-$tickets = $bookingModel->getAllBookings();
+// Thêm vào sau khi khởi tạo các biến cần thiết
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$itemsPerPage = 10;
+
+$totalTickets = $bookingModel->getTotalBookings();
+$pagination = new Pagination($totalTickets, $itemsPerPage, $page);
+$tickets = $bookingModel->getBookingsByPagination($pagination->getOffset(), $pagination->getLimit());
 ?>
 
 <div class="container mt-4">
     <h2 class="mb-4">Quản lý vé</h2>
 
     <?php if (isset($success)): ?>
-        <div class="alert alert-success"><?php echo $success; ?></div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
+            <?php echo $success; unset($success); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?php echo $error; ?></div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
+            <?php echo $error; unset($error); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <div class="table-responsive">
@@ -104,6 +116,7 @@ $tickets = $bookingModel->getAllBookings();
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php echo $pagination->createLinks('manage_tickets.php'); ?>
     </div>
 </div>
 

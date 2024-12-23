@@ -126,4 +126,28 @@ class Schedule extends Database
 
         return $this->select($stmt);
     }
+
+    public function getTotalSchedules()
+    {
+        $sql = "SELECT COUNT(*) as total FROM schedules";
+        $result = self::$connection->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+    public function getSchedulesByPagination($offset, $limit)
+    {
+        $sql = "SELECT s.*, m.title as movie_title, r.name as room_name, t.name as theater_name 
+                FROM schedules s
+                JOIN movies m ON s.movie_id = m.id
+                JOIN rooms r ON s.room_id = r.id
+                JOIN theaters t ON r.theater_id = t.id
+                ORDER BY s.show_date DESC, s.show_time DESC 
+                LIMIT ?, ?";
+        $stmt = self::$connection->prepare($sql);
+        $stmt->bind_param("ii", $offset, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }
