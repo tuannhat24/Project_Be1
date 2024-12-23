@@ -11,6 +11,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Room.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Seat.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/GenreModel.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Project_Be1/Booking-movies/app/models/Banner.php';
 
 // Khởi tạo các đối tượng model
 $userModel = new User();
@@ -21,6 +22,7 @@ $bookingModel = new Booking();
 $roomModel = new Room();
 $seatModel = new Seat();
 $genreModel = new GenreModel();
+$bannerModel = new Banner();
 ?>
 
 <?php
@@ -83,6 +85,8 @@ if (isset($_SESSION['user_id'])) {
                                 <select class="form-select" onchange="window.location.href=this.value">
                                     <option value="/Project_Be1/Booking-movies/admin/manage_movies.php"
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_movies.php') echo 'selected'; ?>>Manage Movies</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_banners.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_banners.php') echo 'selected'; ?>>Manage Banners</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_schedules.php"
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_schedules.php') echo 'selected'; ?>>Manage Schedules</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_tickets.php"

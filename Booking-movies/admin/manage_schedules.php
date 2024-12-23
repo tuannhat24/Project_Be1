@@ -1,6 +1,7 @@
 <?php
 include '../includes/header.php';
 require_once '../app/models/Room.php';
+require_once '../app/common/Pagination.php';
 
 // Khởi tạo các model
 $roomModel = new Room();
@@ -63,8 +64,14 @@ if (isset($_GET['delete'])) {
 $movies = $movieModel->getAllMovies();
 // Lấy danh sách phòng chiếu
 $rooms = $roomModel->getAllRooms();
-// Lấy danh sách lịch chiếu
-$schedules = $scheduleModel->getAllSchedules();
+
+// Thêm vào sau khi khởi tạo các biến cần thiết
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$itemsPerPage = 10;
+
+$totalSchedules = $scheduleModel->getTotalSchedules();
+$pagination = new Pagination($totalSchedules, $itemsPerPage, $page);
+$schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), $pagination->getLimit());
 ?>
 
 <div class="container mt-4">
@@ -127,6 +134,7 @@ $schedules = $scheduleModel->getAllSchedules();
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php echo $pagination->createLinks('manage_schedules.php'); ?>
     </div>
 </div>
 

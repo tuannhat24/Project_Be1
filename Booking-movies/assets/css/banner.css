@@ -40,7 +40,7 @@
 
 .carousel-control-prev,
 .carousel-control-next {
-    width: 5%;
+    width: 8% !important;
 }
 
 .carousel-indicators button {
