@@ -21,6 +21,9 @@ class User extends Database
             
             // Kiểm tra mật khẩu
             if (password_verify($password, $user['password'])) {
+                // Lưu thông tin người dùng vào session
+                $_SESSION['isLoggedIn'] = true;
+                $_SESSION['userid'] = $user['id']; // Đảm bảo lưu id người dùng
                 return $user;
             }
         }
@@ -207,5 +210,13 @@ class User extends Database
         $stmt = self::$connection->prepare($sql);
         $stmt->bind_param("ii", $offset, $limit);
         return $this->select($stmt);
+    }
+
+    public function find($user_id) {
+        $sql = parent::$connection->prepare("SELECT id, username, fullname FROM users WHERE id = ?");
+        $sql->bind_param('i', $user_id);
+        $sql->execute();
+        $result = $sql->get_result();
+        return $result->fetch_assoc();
     }
 } 

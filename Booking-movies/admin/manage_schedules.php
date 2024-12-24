@@ -127,7 +127,7 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
                         <td><?php echo $schedule['id']; ?></td>
                         <td><?php echo $schedule['movie_title']; ?></td>
                         <td><?php echo $schedule['theater_name']; ?></td>
-                        <td><?php echo $schedule['room_name']; ?></td>
+                        <td><?php echo $schedule['room_type']; ?></td>
                         <td><?php echo date('d/m/Y', strtotime($schedule['show_date'])); ?></td>
                         <td><?php echo date('H:i', strtotime($schedule['show_time'])); ?></td>
                         <td><?php echo number_format($schedule['price']); ?>đ</td>

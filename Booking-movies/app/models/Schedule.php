@@ -5,7 +5,7 @@ class Schedule extends Database
 {
     public function getAllSchedules()
     {
-        $sql = "SELECT s.*, m.title as movie_title, t.name as theater_name, r.name as room_name
+        $sql = "SELECT s.*, m.title as movie_title, t.name as theater_name, r.room_type as room_type
                 FROM schedules s
                 JOIN movies m ON s.movie_id = m.id
                 JOIN rooms r ON s.room_id = r.id
@@ -18,7 +18,7 @@ class Schedule extends Database
 
     public function getSchedulesByMovie($movie_id)
     {
-        $sql = "SELECT s.*, t.name as theater_name, r.name as room_name
+        $sql = "SELECT s.*, t.name as theater_name, r.room_type as room_type
                 FROM schedules s 
                 JOIN rooms r ON s.room_id = r.id
                 JOIN theaters t ON r.theater_id = t.id
@@ -34,7 +34,7 @@ class Schedule extends Database
 
     public function getSchedulesByDate($date, $theater_id = null)
     {
-        $sql = "SELECT s.*, m.title, m.poster, t.name as theater_name, r.name as room_name
+        $sql = "SELECT s.*, m.title, m.poster, t.name as theater_name, r.room_type as room_type
                 FROM schedules s 
                 JOIN movies m ON s.movie_id = m.id 
                 JOIN rooms r ON s.room_id = r.id
@@ -96,7 +96,7 @@ class Schedule extends Database
 
     public function getScheduleById($id)
     {
-        $sql = "SELECT s.*, m.title, t.name as theater_name, r.name as room_name
+        $sql = "SELECT s.*, m.title, t.name as theater_name, r.room_type as room_type
                 FROM schedules s 
                 JOIN movies m ON s.movie_id = m.id 
                 JOIN rooms r ON s.room_id = r.id
@@ -111,7 +111,7 @@ class Schedule extends Database
 
     public function getScheduleByMovieRoomDateTime($movie_id, $room_id, $show_date, $show_time)
     {
-        $sql = "SELECT s.*, m.title as movie_title, t.name as theater_name, r.name as room_name
+        $sql = "SELECT s.*, m.title as movie_title, t.name as theater_name, r.room_type as room_type
                 FROM schedules s
                 JOIN movies m ON s.movie_id = m.id
                 JOIN rooms r ON s.room_id = r.id
@@ -137,7 +137,7 @@ class Schedule extends Database
 
     public function getSchedulesByPagination($offset, $limit)
     {
-        $sql = "SELECT s.*, m.title as movie_title, r.name as room_name, t.name as theater_name 
+        $sql = "SELECT s.*, m.title as movie_title, r.room_type as room_type, t.name as theater_name 
                 FROM schedules s
                 JOIN movies m ON s.movie_id = m.id
                 JOIN rooms r ON s.room_id = r.id

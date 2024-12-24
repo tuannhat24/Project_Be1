@@ -23,6 +23,11 @@ $roomModel = new Room();
 $seatModel = new Seat();
 $genreModel = new GenreModel();
 $bannerModel = new Banner();
+
+// Lấy danh sách phim
+$allMovies = $movieModel->getAllMovies(); // Giả sử bạn có phương thức này trong Movie model
+$randomMovie = $allMovies[array_rand($allMovies)]; // Chọn một bộ phim ngẫu nhiên
+
 ?>
 
 <?php
@@ -62,9 +67,9 @@ if (isset($_SESSION['user_id'])) {
                             Thể Loại
                         </a>
                         <ul class="dropdown-menu">
-                            <?php 
+                            <?php
                             $allGenres = $genreModel->getAllGenres();
-                            foreach ($allGenres as $genre): 
+                            foreach ($allGenres as $genre):
                             ?>
                                 <li>
                                     <a class="dropdown-item" href="/Project_Be1/Booking-movies/genre.php?genre=<?php echo $genre['slug']; ?>">
@@ -77,6 +82,9 @@ if (isset($_SESSION['user_id'])) {
                     <li class="nav-item">
                         <a class="nav-link" href="/Project_Be1/Booking-movies/search.php">Tìm Kiếm</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Project_Be1/Booking-movies/movie.php?id=<?php echo $randomMovie['id']; ?>">Random Movie</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isset($_SESSION['user_id'])): ?>
@@ -88,6 +96,10 @@ if (isset($_SESSION['user_id'])) {
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_movies.php') echo 'selected'; ?>>Manage Movies</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_banners.php"
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_banners.php') echo 'selected'; ?>>Manage Banners</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_theaters.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_theaters.php') echo 'selected'; ?>>Manage Theaters</option>
+                                    <option value="/Project_Be1/Booking-movies/admin/manage_rooms.php"
+                                        <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_rooms.php') echo 'selected'; ?>>Manage Rooms</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_schedules.php"
                                         <?php if ($current_page == '/Project_Be1/Booking-movies/admin/manage_schedules.php') echo 'selected'; ?>>Manage Schedules</option>
                                     <option value="/Project_Be1/Booking-movies/admin/manage_tickets.php"

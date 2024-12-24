@@ -28,7 +28,7 @@ class Banner extends Database {
     }
 
     public function getAllBanners() {
-        $sql = "SELECT b.*, m.title 
+        $sql = "SELECT b.*, m.title AS title, m.description AS description
                 FROM banners b
                 LEFT JOIN movies m ON b.movie_id = m.id
                 ORDER BY b.created_at DESC";
@@ -38,13 +38,27 @@ class Banner extends Database {
     }
 
     public function addBanner($data) {
-        $sql = "INSERT INTO banners (movie_id, image, status) 
-                VALUES (?, ?, ?)";
+        $movieModel = new Movie();
+        $movie = $movieModel->getMovieById($data['movie_id']);
+        
+        if ($movie) {
+            $title = $movie['title'];
+        } else {
+            return false;
+        }
+
+        $sql = "INSERT INTO banners (movie_id, image, title, status) 
+                VALUES (?, ?, ?, ?)";
         $stmt = self::$connection->prepare($sql);
-        $stmt->bind_param("iss", 
+
+        $image = $data['image'] ?? null;
+        $status = $data['status'] ?? 'active';
+
+        $stmt->bind_param("isss", 
             $data['movie_id'],
-            $data['image'],
-            $data['status'] ?? 'active'
+            $image,
+            $title,
+            $status
         );
 
         return $stmt->execute();

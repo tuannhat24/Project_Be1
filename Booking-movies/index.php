@@ -35,7 +35,7 @@ if (empty($banners)) {
                             <div class="featured-movie-content">
                                 <h1><?php echo $banner['title']; ?></h1>
                                 <p class="movie-description">
-                                    <?php echo substr($banner['description'], 0, 200) . '...'; ?>
+                                    <?php echo substr($banner['description'], 0, 150) . '...'; ?>
                                 </p>
                                 <div class="movie-info">
                                     <?php if (isset($banner['rates'])): ?>

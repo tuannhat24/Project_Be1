@@ -144,8 +144,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h5 class="mb-0">Thông tin đặt vé</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Phim:</strong> <?php echo $schedule['title']; ?></p>
-                    <p><strong>Rạp:</strong> <?php echo $schedule['theater_name']; ?></p>
+                    <p><strong>Phim:</strong> <?php echo htmlspecialchars($schedule['title']); ?></p>
+                    <p><strong>Rạp:</strong> <?php echo htmlspecialchars($schedule['theater_name']); ?></p>
+                    <p><strong>Loại phòng:</strong> <?php echo isset($schedule['room_type']) ? htmlspecialchars($schedule['room_type']) : 'Không xác định'; ?></p>
                     <p><strong>Suất chiếu:</strong> <?php echo date('d/m/Y H:i', strtotime($schedule['show_time'])); ?></p>
                     <p><strong>Giá vé:</strong> <?php echo number_format($schedule['price']); ?>đ/ghế</p>
 

@@ -68,7 +68,7 @@ $tickets = $bookingModel->getBookingsByPagination($pagination->getOffset(), $pag
         <table class="table">
             <thead>
                 <tr>
-                    <th>Mã vé</th>
+                    <th style="min-width: 60px;">Mã vé</th>
                     <th>Người đặt</th>
                     <th>Phim</th>
                     <th>Rạp</th>
@@ -78,7 +78,7 @@ $tickets = $bookingModel->getBookingsByPagination($pagination->getOffset(), $pag
                     <th>Giá vé</th>
                     <th>Ngày đặt</th>
                     <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th style="min-width: 80px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>

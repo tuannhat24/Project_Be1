@@ -1,7 +1,9 @@
 <?php
 include 'includes/header.php';
 require_once 'app/models/TheaterModel.php';
+require_once 'app/models/Schedule.php';
 
+$scheduleModel = new Schedule();
 $theaterModel = new TheaterModel();
 
 $theaters = $theaterModel->getAllTheaters();
@@ -64,38 +66,62 @@ for ($i = 0; $i < 7; $i++) {
         </div>
     <?php else: ?>
         <?php
-        $current_movie = '';
-        foreach ($schedules as $schedule):
-            if ($schedule['title'] != $current_movie):
-                if ($current_movie != '') echo '</div></div></div></div></div>';
-                $current_movie = $schedule['title'];
+        // Nhóm lịch chiếu theo movie để phục vụ hiển thị
+        $grouped_schedules = [];
+        foreach ($schedules as $schedule) {
+            $movie_id = $schedule['movie_id'];
+            if (!isset($grouped_schedules[$movie_id])) {
+                $grouped_schedules[$movie_id] = [
+                    'title' => $schedule['title'],
+                    'poster' => $schedule['poster'],
+                    'schedules' => []
+                ];
+            }
+            $grouped_schedules[$movie_id]['schedules'][] = $schedule;
+        }
+
+        foreach ($grouped_schedules as $movie_id => $movie_data):
         ?>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <img src="./assets/img/<?php echo $schedule['poster']; ?>" class="img-fluid rounded"
-                                    alt="<?php echo $schedule['title']; ?>" style="height: 200px;">
-                            </div>
-                            <div class="col-md-9">
-                                <h4><?php echo $schedule['title']; ?></h4>
-                                <div class="showtimes">
-                                <?php endif; ?>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="./assets/img/<?php echo htmlspecialchars($movie_data['poster']); ?>" class="img-fluid rounded"
+                                alt="<?php echo htmlspecialchars($movie_data['title']); ?>" style="height: 200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4><?php echo htmlspecialchars($movie_data['title']); ?></h4>
+                            <strong>Loại phòng:</strong>
+                            <?php
+                            // Nhóm lịch chiếu theo loại phòng
+                            $room_group = [];
+                            foreach ($movie_data['schedules'] as $sch) {
+                                $room = $sch['room_type'];
+                                if (!isset($room_group[$room])) {
+                                    $room_group[$room] = [];
+                                }
+                                $room_group[$room][] = $sch;
+                            }
 
-                                <a href="user/booking.php?schedule_id=<?php echo $schedule['id']; ?>"
-                                    class="btn btn-outline-primary me-2 mb-2">
-                                    <?php echo date('H:i', strtotime($schedule['show_time'])); ?>
-                                    - <?php echo $schedule['theater_name']; ?>
-                                    (<?php echo number_format($schedule['price']); ?>đ)
-                                </a>
-
-                            <?php endforeach; ?>
+                            foreach ($room_group as $room_type => $room_schedules):
+                            ?>
+                                <div class="mt-2">
+                                    <strong><?php echo htmlspecialchars($room_type); ?>:</strong>
+                                    <?php foreach ($room_schedules as $sch): ?>
+                                        <a href="user/booking.php?schedule_id=<?php echo $sch['id']; ?>" class="btn btn-outline-primary me-2 mb-2">
+                                            <?php echo date('H:i', strtotime($sch['show_time'])); ?>
+                                            - <?php echo htmlspecialchars($sch['theater_name']); ?>
+                                            (<?php echo number_format($sch['price']); ?>đ)
+                                        </a>
+                                    <?php endforeach; ?>
                                 </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 
 <?php include 'includes/footer.php'; ?>
