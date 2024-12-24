@@ -4,13 +4,13 @@ require_once 'db.php';
 class TheaterModel extends Database
 {
     // Lấy tất cả các rạp chiếu
-    public function getAllTheaters($limit = 10)
+    public function getAllTheaters()
     {
-        $sql = "SELECT * FROM theaters ORDER BY name LIMIT ?";
+        $sql = "SELECT * FROM theaters";
         $stmt = self::$connection->prepare($sql);
-        $stmt->bind_param("i", $limit);
-
-        return $this->select($stmt);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     // Lấy rạp chiếu theo ID

@@ -221,17 +221,53 @@ $theaters = $theaterModel->getTheatersByPagination($pagination->getOffset(), $pa
 
 
 <script>
-    const editButtons = document.querySelectorAll('.edit-theater');
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.edit-theater');
 
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const theater = JSON.parse(this.getAttribute('data-theater'));
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theater = JSON.parse(this.getAttribute('data-theater'));
 
-            document.getElementById('edit_id').value = theater.id;
-            document.getElementById('edit_name').value = theater.name;
-            document.getElementById('edit_address').value = theater.address;
-            document.getElementById('edit_phone').value = theater.phone;
-            document.getElementById('edit_total_seats').value = theater.total_seats;
+                document.getElementById('edit_id').value = theater.id;
+                document.getElementById('edit_name').value = theater.name;
+                document.getElementById('edit_address').value = theater.address;
+                document.getElementById('edit_phone').value = theater.phone;
+                document.getElementById('edit_total_seats').value = theater.total_seats;
+            });
+        });
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
+        });
+
+        // Xử lý sự kiện khi modal đóng
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function() {
+                // Xóa backdrop khi modal đóng
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+            });
         });
     });
 </script>

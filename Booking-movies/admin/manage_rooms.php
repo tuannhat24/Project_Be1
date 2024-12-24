@@ -85,24 +85,24 @@ $theaters = $theaterModel->getAllTheaters();
     <h2>Quản lý các phòng chiếu phim</h2>
 
     <div class="toast-container">
-        <?php if (isset($success)): ?>
+        <?php if (isset($_SESSION['success'])): ?>
             <div class="toast custom-toast align-items-center text-white bg-success border-0" role="alert">
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="fas fa-check-circle me-2"></i>
-                        <?php echo $success; ?>
+                        <?php echo $_SESSION['success']; ?>
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             </div>
         <?php endif; ?>
 
-        <?php if (isset($error)): ?>
+        <?php if (isset($_SESSION['error'])): ?>
             <div class="toast custom-toast align-items-center text-white bg-danger border-0" role="alert">
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        <?php echo $error; ?>
+                        <?php echo $_SESSION['error']; ?>
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
@@ -209,7 +209,7 @@ $theaters = $theaterModel->getAllTheaters();
                         <select id="room_type" name="room_type" class="form-select" required>
                             <option value="2D" <?= $room['room_type'] === '2D' ? 'selected' : '' ?>>2D</option>
                             <option value="3D" <?= $room['room_type'] === '3D' ? 'selected' : '' ?>>3D</option>
-                            <option value="4DX" <?= $room['room_type'] === '4DX' ? 'selected' : '' ?>>4DX</option>
+                            <option value="4D" <?= $room['room_type'] === '4D' ? 'selected' : '' ?>>4D</option>
                         </select>
                     </div>
                     <!-- <div class="form-group">
@@ -242,9 +242,9 @@ $theaters = $theaterModel->getAllTheaters();
                     <div class="form-group">
                         <label for="theater_id">Chọn Rạp Chiếu</label>
                         <select name="theater_id" id="theater_id" class="form-select">
-                            <option value="" disabled selected>-- Chọn Rạp Chiếu --</option>
+                            <option value="" disabled>-- Chọn Rạp Chiếu --</option>
                             <?php foreach ($theaters as $theater): ?>
-                                <option value="<?php echo $theater['id']; ?>">
+                                <option value="<?php echo $theater['id']; ?>" <?php echo ($theater['id'] == $theaters) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($theater['name']); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -263,7 +263,7 @@ $theaters = $theaterModel->getAllTheaters();
                         <select id="edit_room_type" name="room_type" class="form-select" required>
                             <option value="2D" <?= $room['room_type'] === '2D' ? 'selected' : '' ?>>2D</option>
                             <option value="3D" <?= $room['room_type'] === '3D' ? 'selected' : '' ?>>3D</option>
-                            <option value="4DX" <?= $room['room_type'] === '4DX' ? 'selected' : '' ?>>4DX</option>
+                            <option value="4D" <?= $room['room_type'] === '4D' ? 'selected' : '' ?>>4D</option>
                         </select>
                     </div>
                     <!-- <div class="form-group">
@@ -298,6 +298,41 @@ $theaters = $theaterModel->getAllTheaters();
                 // Update theater dropdown
                 // This assumes you have already loaded the theaters dynamically on the server side.
                 // Dynamically populate the theater select element based on roomData.theater_id.
+            });
+        });
+
+
+        const toastElList = document.querySelectorAll('.toast');
+        const toastList = [...toastElList].map(toastEl => {
+            const toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 3000
+            });
+            toast.show();
+            return toast;
+        });
+
+        setTimeout(() => {
+            document.querySelectorAll('.custom-toast').forEach(toast => {
+                toast.classList.add('show');
+            });
+        }, 100);
+
+        toastElList.forEach(toastEl => {
+            toastEl.addEventListener('hide.bs.toast', function() {
+                this.classList.remove('show');
+            });
+        });
+
+        // Xử lý sự kiện khi modal đóng
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function() {
+                // Xóa backdrop khi modal đóng
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
             });
         });
     });
