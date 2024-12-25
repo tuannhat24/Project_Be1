@@ -90,7 +90,7 @@ $average_rating = is_array($ratings) ? $ratings['average_rating'] : $ratings;
             <div class="mb-3">
                 <strong>Đánh giá trung bình:</strong>
                 <span class="rating">
-                    <?php echo number_format($average_rating, 1); ?>/10
+                    <?php echo $movie['rates']; ?>/10
                     <img src="./assets/img/star-solid.svg" alt="rating star" style="height: 24px; margin-left: 5px;">
                 </span>
             </div>
