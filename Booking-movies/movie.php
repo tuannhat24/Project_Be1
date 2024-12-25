@@ -109,7 +109,7 @@ $average_rating = is_array($ratings) ? $ratings['average_rating'] : $ratings;
             <div class="mb-4">
                 <h5>Đánh giá phim:</h5>
                 <div class="rating">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <?php for ($i = 1; $i <= 10; $i++): ?>
                         <span class="star" data-value="<?php echo $i; ?>">
                             <img src="./assets/img/star-empty.svg" alt="star" class="star-icon" />
                         </span>
