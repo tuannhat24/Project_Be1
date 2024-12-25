@@ -103,7 +103,7 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
         <?php endif; ?>
     </div>
 
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
         Thêm lịch chiếu mới
     </button>
 
@@ -150,17 +150,16 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
     </div>
 </div>
 
-<!-- Modal thêm/sửa lịch chiếu -->
-<div class="modal fade" id="scheduleModal" tabindex="-1">
+<!-- Modal thêm lịch chiếu -->
+<div class="modal fade" id="addScheduleModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Thêm/Sửa lịch chiếu</h5>
+                <h5 class="modal-title">Thêm lịch chiếu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" id="scheduleForm">
-                    <input type="hidden" name="id" id="schedule-id">
+                <form method="POST" id="addScheduleForm">
                     <div class="mb-3">
                         <label>Phim</label>
                         <select name="movie_id" class="form-control" required>
@@ -200,42 +199,75 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
     </div>
 </div>
 
+<!-- Modal sửa lịch chiếu -->
+<div class="modal fade" id="editScheduleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa lịch chiếu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="editScheduleForm">
+                    <input type="hidden" name="id" id="schedule-id">
+                    <div class="mb-3">
+                        <label>Phim</label>
+                        <select name="movie_id" class="form-control" required>
+                            <?php foreach ($movies as $movie): ?>
+                                <option value="<?php echo $movie['id']; ?>">
+                                    <?php echo $movie['title']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Phòng chiếu</label>
+                        <select name="room_id" class="form-control" required>
+                            <?php foreach ($rooms as $room): ?>
+                                <option value="<?php echo $room['id']; ?>">
+                                    <?php echo $room['name'] . ' - ' . $room['theater_name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Ngày chiếu</label>
+                        <input type="date" name="show_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Giờ chiếu</label>
+                        <input type="time" name="show_time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Giá vé</label>
+                        <input type="number" name="price" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Xử lý thông báo tự động ẩn sau 2s
-        const successAlert = document.getElementById('successAlert');
-        if (successAlert) {
-            setTimeout(function() {
-                const alert = bootstrap.Alert.getOrCreateInstance(successAlert);
-                alert.close();
-            }, 2000);
-        }
-
-        const errorAlert = document.getElementById('errorAlert');
-        if (errorAlert) {
-            setTimeout(function() {
-                const alert = bootstrap.Alert.getOrCreateInstance(errorAlert);
-                alert.close();
-            }, 2000);
-        }
-
         // Xử lý form sửa lịch chiếu
         const editButtons = document.querySelectorAll('.edit-schedule');
-        const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-        const scheduleForm = document.getElementById('scheduleForm');
+        const editScheduleModal = new bootstrap.Modal(document.getElementById('editScheduleModal'));
+        const editScheduleForm = document.getElementById('editScheduleForm');
 
         editButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const schedule = JSON.parse(this.dataset.schedule);
 
-                scheduleForm.id.value = schedule.id;
-                scheduleForm.movie_id.value = schedule.movie_id;
-                scheduleForm.room_id.value = schedule.room_id;
-                scheduleForm.show_date.value = schedule.show_date;
-                scheduleForm.show_time.value = schedule.show_time;
-                scheduleForm.price.value = schedule.price;
+                editScheduleForm.id.value = schedule.id;
+                editScheduleForm.movie_id.value = schedule.movie_id;
+                editScheduleForm.room_id.value = schedule.room_id;
+                editScheduleForm.show_date.value = schedule.show_date;
+                editScheduleForm.show_time.value = schedule.show_time;
+                editScheduleForm.price.value = schedule.price;
 
-                scheduleModal.show();
+                editScheduleModal.show();
             });
         });
 
@@ -266,6 +298,10 @@ $schedules = $scheduleModel->getSchedulesByPagination($pagination->getOffset(), 
             toastEl.addEventListener('hide.bs.toast', function() {
                 this.classList.remove('show');
             });
+        });
+
+        document.querySelector('[data-bs-target="#addScheduleModal"]').addEventListener('click', function() {
+            document.getElementById('addScheduleForm').reset();
         });
     });
 </script>
